@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getEntries, createEntry, updateEntry, deleteEntry, getMoods } from '../services/api'
+import { socket } from '../services/socket'
 import './JournalPage.css'
 
 import journalIcon from '../assets/journal.svg'
@@ -71,6 +72,16 @@ export default function JournalPage() {
     loadData()
   }, [])
 
+  useEffect(() => {
+    socket.on('journal-entry-created', () => {
+      loadData()
+    })
+
+    return () => {
+      socket.off('journal-entry-created')
+    }
+  }, [])
+
   const loadData = async () => {
     try {
       const [entriesResponse, moodsResponse] = await Promise.all([
@@ -81,7 +92,7 @@ export default function JournalPage() {
       setEntries(entriesResponse.data || [])
       setMoods(moodsResponse.data || [])
     } catch (error) {
-      console.error('Failed to load data:', error)
+      console.error('Failed to load data:', error.response?.data || error.message)
     } finally {
       setLoading(false)
     }
@@ -96,6 +107,22 @@ export default function JournalPage() {
     })
     setEditingId(null)
     setShowForm(false)
+  }
+
+  const openNewEntryForm = () => {
+    if (showForm && !editingId) {
+      setShowForm(false)
+      return
+    }
+
+    setEditingId(null)
+    setFormData({
+      title: '',
+      content: '',
+      mood_id: '',
+      customMood: ''
+    })
+    setShowForm(true)
   }
 
   const handleSubmit = async (e) => {
@@ -120,11 +147,16 @@ export default function JournalPage() {
           selectedMoodValue
         )
       } else {
-        await createEntry(
+        const response = await createEntry(
           formData.title.trim(),
           formData.content.trim(),
           selectedMoodValue
         )
+
+        socket.emit('journal-entry-created', {
+          entryId: response.data.id,
+          title: response.data.title
+        })
       }
 
       resetForm()
@@ -140,9 +172,11 @@ export default function JournalPage() {
 
     try {
       await deleteEntry(id)
+
       if (expandedEntryId === id) {
         setExpandedEntryId(null)
       }
+
       await loadData()
     } catch (error) {
       console.error('Failed to delete entry:', error.response?.data || error.message)
@@ -215,23 +249,9 @@ export default function JournalPage() {
         <button
           data-cy="new-entry-button"
           className="new-entry-btn"
-          onClick={() => {
-            if (showForm && !editingId) {
-              setShowForm(false)
-            } else {
-              setShowForm(true)
-              if (!editingId) {
-                setFormData({
-                  title: '',
-                  content: '',
-                  mood_id: '',
-                  customMood: ''
-                })
-              }
-            }
-          }}
+          onClick={openNewEntryForm}
         >
-          {showForm ? 'Close form' : 'New Entry'}
+          {showForm && !editingId ? 'Close form' : 'New Entry'}
         </button>
       </div>
 

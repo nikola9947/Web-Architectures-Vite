@@ -1,5 +1,6 @@
 import express from 'express'
 import { dbRun, dbGet, dbAll } from '../utils/database.js'
+import { sendEventToClients } from '../utils/events.js'
 
 const router = express.Router()
 
@@ -12,7 +13,7 @@ function resolveMoodValue(body) {
   return rawMood || null
 }
 
-// Get all journal entries for a user
+// Get all journal entries
 router.get('/', async (req, res) => {
   try {
     const userId = 1 // Temporary: no auth
@@ -41,10 +42,10 @@ router.get('/', async (req, res) => {
   }
 })
 
-// Get a specific journal entry
+// Get specific journal entry
 router.get('/:id', async (req, res) => {
   try {
-    const userId = 1 // Temporary: no auth
+    const userId = 1
     const entryId = req.params.id
 
     const entry = await dbGet(
@@ -74,10 +75,10 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-// Create a new journal entry
+// Create journal entry
 router.post('/', async (req, res) => {
   try {
-    const userId = 1 // Temporary: no auth
+    const userId = 1
     const { title, content } = req.body
     const mood = resolveMoodValue(req.body)
 
@@ -109,6 +110,11 @@ router.post('/', async (req, res) => {
       [result.id]
     )
 
+    sendEventToClients('entries-updated', {
+      type: 'created',
+      entryId: newEntry.id
+    })
+
     res.status(201).json(newEntry)
   } catch (error) {
     console.error('POST /entries failed:', error)
@@ -116,10 +122,10 @@ router.post('/', async (req, res) => {
   }
 })
 
-// Update a journal entry
+// Update journal entry
 router.put('/:id', async (req, res) => {
   try {
-    const userId = 1 // Temporary: no auth
+    const userId = 1
     const entryId = req.params.id
     const { title, content } = req.body
     const mood = resolveMoodValue(req.body)
@@ -168,6 +174,11 @@ router.put('/:id', async (req, res) => {
       [entryId]
     )
 
+    sendEventToClients('entries-updated', {
+      type: 'updated',
+      entryId: updated.id
+    })
+
     res.json(updated)
   } catch (error) {
     console.error('PUT /entries/:id failed:', error)
@@ -175,10 +186,10 @@ router.put('/:id', async (req, res) => {
   }
 })
 
-// Delete a journal entry
+// Delete journal entry
 router.delete('/:id', async (req, res) => {
   try {
-    const userId = 1 // Temporary: no auth
+    const userId = 1
     const entryId = req.params.id
 
     const entry = await dbGet(
@@ -194,6 +205,11 @@ router.delete('/:id', async (req, res) => {
       'DELETE FROM journal_entries WHERE id = ? AND user_id = ?',
       [entryId, userId]
     )
+
+    sendEventToClients('entries-updated', {
+      type: 'deleted',
+      entryId
+    })
 
     res.json({ message: 'Entry deleted' })
   } catch (error) {
