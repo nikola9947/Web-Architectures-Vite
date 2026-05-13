@@ -1,3 +1,92 @@
+## Architektur-Entscheidung: SSR/Next.js oder Vite?
+
+Unsere App braucht aktuell kein SSR mit Next.js. Der Mood Tracker ist hauptsächlich eine interaktive Web-App mit Login, Dashboard, Journal, Skills und Kalender, also eher ein persönliches Tool als eine öffentlich indexierbare Website. SEO ist für uns kaum relevant, weil die wichtigsten Inhalte erst nach dem Login sichtbar sind und nicht von Suchmaschinen gefunden werden müssen. Deshalb ist Vite für unser Projekt besser geeignet: Es ist einfacher, schneller im Development und passt gut zu einer clientseitigen React-App mit vielen Nutzerinteraktionen.
+
+## Ressourcen unseres Projekts
+
+### Ressourcen
+
+- users
+- moods
+- journal_entries
+- skills
+- user_skills
+
+### Hierarchie
+
+- Ein `journal_entry` gehört zu einem `user`.
+- Ein `mood` kann mit einem `journal_entry` verknüpft sein.
+- `skills` sind allgemeine Ressourcen.
+- `user_skills` verbinden einen `user` mit bestimmten `skills`.
+
+
+## API-Tests ohne Frontend
+
+Wir haben unsere REST-API zusätzlich unabhängig vom Frontend getestet. Dafür wurde HoppScotch verwendet, um Requests direkt an das Express-Backend zu senden und Responses zu prüfen.
+
+### Getestete Endpoints
+
+| Methode | Endpoint | Zweck |
+|---|---|---|
+| POST | /api/auth/register | Nutzer registrieren |
+| POST | /api/auth/login | Nutzer anmelden |
+| GET | /api/entries | Journal-Einträge laden |
+| POST | /api/entries | Journal-Eintrag erstellen |
+| DELETE | /api/entries/:id | Journal-Eintrag löschen |
+
+---
+
+## Fehlerfälle
+
+### 1. Login mit falschem Passwort
+
+#### Request
+
+```txt
+POST /api/auth/login
+
+
+
+## Datenschema unseres Projekts
+
+```txt
+users                  mood_entries              journal_entries
+----------------       -----------------------   -------------------------
+id                     id                        id
+email                  user_id (FK → users)      user_id (FK → users)
+username               mood                      title
+password               intensity                 content
+created_at             notes                     mood_id (FK → mood_entries)
+updated_at             created_at                mood_text
+                                                 created_at
+                                                 updated_at
+
+
+skills                 user_skills
+----------------       -------------------------
+id                     id
+name                   user_id (FK → users)
+description            skill_id (FK → skills)
+category               practiced_count
+for_moods              last_practiced
+instructions           created_at
+created_at
+
+
+## Architekturentscheidung: Datenbank, Redis oder Object Store
+
+In unserer App müssen Nutzer, Login-Daten, Mood-Einträge, Journal-Einträge, Skills und User-Skills dauerhaft in der Datenbank liegen, weil diese Daten strukturiert sind und langfristig gespeichert werden sollen. Redis wäre höchstens für kurzfristige Daten wie Sessions, Rate-Limits oder temporäre Live-Events sinnvoll, aber nicht als Hauptspeicher. Ein Cloud Object Store wie S3 wäre langfristig nur relevant, wenn Nutzer Bilder, Audio-Dateien oder Anhänge zu Journal-Einträgen hochladen könnten; aktuell reicht die normale Datenbank aus.
+
+
+### API-Struktur-Entscheidung
+
+Wir verwenden hauptsächlich ein flaches REST-Design mit einzelnen Ressourcen-Endpunkten, z. B.:
+
+```txt
+/api/entries
+/api/moods
+/api/skills
+/api/auth
 ## Testing Strategy – Test-Pyramide
 
 | Ebene | Was testen wir bei uns? | Tool |
