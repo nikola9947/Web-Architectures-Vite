@@ -1,18 +1,39 @@
 :root {
-  --bg-main: #cae0ec;
-  --bg-card: #91b0bd;
-  --bg-accent: #3a7171;
-  --primary: #163352;
-  --accent: #59a9a1;
-  --purple-soft: #c5b0cd;
-
-  --text-main: #163352;
-  --text-soft: rgba(22, 51, 82, 0.7);
-
-  --shadow-soft: 0 10px 25px rgba(22, 51, 82, 0.15);
+  --bg-main: #ffffff;
+  --bg-card: #ffffff;
+  --green-dark: #061f16;
+  --green-mid: #0b3324;
+  --green-soft: #123f2d;
+  --text-main: #061f16;
+  --text-light: #ffffff;
+  --text-muted: rgba(6, 31, 22, 0.62);
+  --border: rgba(6, 31, 22, 0.14);
+  --shadow: 0 12px 28px rgba(6, 31, 22, 0.12);
 }
 
-/* APP LAYOUT */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+textarea {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
 .app {
   display: flex;
   flex-direction: column;
@@ -21,7 +42,6 @@
   color: var(--text-main);
 }
 
-/* CONTENT */
 .main-content {
   flex: 1;
   width: 100%;
@@ -30,29 +50,25 @@
   padding: 2rem;
 }
 
-/* LOADING */
 .loading {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-soft);
+  color: var(--green-dark);
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-/* OPTIONAL: GLOBAL SMOOTH LOOK */
-* {
-  box-sizing: border-box;
+a {
+  color: var(--green-dark);
 }
 
-body {
-  margin: 0;
-  background: var(--bg-main);
-  font-family: system-ui, -apple-system, sans-serif;
+::selection {
+  background: var(--green-dark);
+  color: var(--text-light);
 }
 
-/* MOBILE */
 @media (max-width: 768px) {
   .main-content {
     padding: 1rem;

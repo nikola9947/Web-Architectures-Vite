@@ -9,10 +9,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
+  color: #061f16;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 800;
 }
+
+/* HERO */
 
 .dashboard-hero {
   display: flex;
@@ -21,12 +23,9 @@
   gap: 1rem;
   padding: 2rem;
   border-radius: 28px;
-  background:
-    radial-gradient(circle at top left, oklch(78.427% 0.05609 146.714 / 0.22), transparent 32%),
-    linear-gradient(135deg, rgba(58, 113, 113, 0.06), rgba(22, 51, 82, 0.08)),
-    #ffffff;
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  background: #ffffff;
+  border: 1px solid rgba(6, 31, 22, 0.12);
+  box-shadow: 0 12px 28px rgba(6, 31, 22, 0.08);
 }
 
 .dashboard-hero-content {
@@ -35,32 +34,28 @@
 
 .dashboard-kicker,
 .section-kicker {
-  margin: 0 0 0.45rem 0;
+  margin: 0 0 0.45rem;
   font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--text-muted);
+  color: rgba(6, 31, 22, 0.55);
 }
 
 .dashboard-hero h1 {
   margin: 0;
   font-size: 2.35rem;
   line-height: 1.1;
-  color: var(--text-main);
+  color: #061f16;
   font-weight: 900;
 }
 
 .dashboard-subtitle {
   margin-top: 0.85rem;
   max-width: 640px;
-  color: var(--text-secondary);
+  color: rgba(6, 31, 22, 0.72);
   font-size: 1rem;
   line-height: 1.7;
-}
-
-.dashboard-hero {
-  background: #cae0ec;
 }
 
 .dashboard-hero-badge {
@@ -70,16 +65,17 @@
   justify-content: center;
   align-items: center;
   border-radius: 24px;
-  background: #3a7171;
+  background: #061f16;
+  color: #ffffff;
   padding: 1.5rem;
-  box-shadow: var(--shadow);
+  box-shadow: 0 12px 24px rgba(6, 31, 22, 0.18);
 }
 
 .badge-label {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  opacity: 0.82;
+  opacity: 0.75;
   font-weight: 700;
 }
 
@@ -89,15 +85,13 @@
   font-weight: 900;
 }
 
+/* GRID */
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
   gap: 1.5rem;
   align-items: start;
-}
-
-.dashboard-main-card {
-  min-height: 100%;
 }
 
 .dashboard-side-column {
@@ -106,27 +100,25 @@
   gap: 1.5rem;
 }
 
-.card {
-  background: #91b0bd;
-  border-radius: 20px;
+/* CARDS */
+
+.card,
+.compact-card,
+.dashboard-main-card {
+  background: #ffffff;
+  border-radius: 22px;
   padding: 1.5rem;
-
-  border: 1px solid rgba(22, 51, 82, 0.08);
-  box-shadow: 0 10px 25px rgba(22, 51, 82, 0.1);
-
-  color: #163352; /* wichtig für Lesbarkeit */
-  transition: 0.2s;
+  border: 1px solid rgba(6, 31, 22, 0.12);
+  box-shadow: 0 12px 28px rgba(6, 31, 22, 0.08);
+  color: #061f16;
+  transition: 0.2s ease;
 }
 
-.card:hover {
+.card:hover,
+.compact-card:hover,
+.dashboard-main-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 35px rgba(22, 51, 82, 0.15);
-}
-
-.compact-card {
-  background: #cae0ec;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(22, 51, 82, 0.1);
+  box-shadow: 0 16px 32px rgba(6, 31, 22, 0.12);
 }
 
 .section-heading {
@@ -140,10 +132,12 @@
 .section-heading h2,
 .section-heading h3 {
   margin: 0;
-  color: var(--text-main);
+  color: #061f16;
   font-weight: 900;
   line-height: 1.2;
 }
+
+/* LATEST MOOD */
 
 .latest-mood-card {
   display: flex;
@@ -151,55 +145,41 @@
   gap: 1rem;
   border-radius: 20px;
   padding: 1.15rem;
-  border: 1px solid var(--border);
-  background: #91b0bd;
-  color: white;
-  box-shadow: 0 6px 16px rgba(22, 51, 82, 0.15);
+  background: #061f16;
+  color: #ffffff;
 }
 
 .latest-mood-name {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 900;
-  color: white;
   text-transform: capitalize;
 }
 
-.latest-mood-intensity {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 600;
-}
-
-.latest-mood-intensity span {
-  color: #cae0ec;
-  font-weight: 900;
-}
-
+.latest-mood-intensity,
 .latest-mood-time {
   margin: 0;
-  font-size: 0.86rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.72);
 }
+
+/* SUMMARY */
 
 .summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem; 
+  gap: 1.25rem;
 }
 
 .summary-tile {
   border-radius: 18px;
-  padding : 1.25rem;
-  background: #91b0bd;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 6px 16px rgba(22, 51, 82, 0.15);
+  padding: 1.25rem;
+  background: #061f16;
+  color: #ffffff;
 }
 
 .summary-label {
   display: block;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.65);
   font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -209,10 +189,11 @@
 .summary-value {
   display: block;
   margin-top: 0.35rem;
-  color: white;
   font-size: 1.6rem;
   font-weight: 900;
 }
+
+/* RECOMMENDATIONS */
 
 .recommendation-list {
   display: flex;
@@ -224,44 +205,43 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  background: #cae0ec;
-  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(6, 31, 22, 0.12);
+  border-radius: 18px;
   padding: 16px 20px;
-
-  color: white;
 }
 
 .recommendation-text h4 {
-  margin: 0 0 0.25rem 0;
-  color: var(--text-main);
+  margin: 0 0 0.25rem;
+  color: #061f16;
   font-size: 1rem;
   font-weight: 800;
 }
 
 .recommendation-text p {
   margin: 0;
-  color: var(--text-secondary);
+  color: rgba(6, 31, 22, 0.72);
   line-height: 1.55;
   font-size: 0.94rem;
 }
 
-.action-btn {
-  background: #3a7171;
-  color: #cae0ec;
+/* BUTTON */
 
+.action-btn {
+  background: #061f16;
+  color: #ffffff;
   border: none;
   border-radius: 12px;
   padding: 8px 14px;
-
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
+  font-weight: 700;
+  transition: 0.2s ease;
 }
 
 .action-btn:hover {
-  background: #59a9a1;
+  background: #0b3324;
 }
+
+/* HISTORY */
 
 .history-list {
   display: flex;
@@ -276,50 +256,45 @@
   gap: 1rem;
   padding: 1rem 1.1rem;
   border-radius: 18px;
-  border: 1px solid var(--border);
-  background: #cae0ec;
+  border: 1px solid rgba(6, 31, 22, 0.12);
+  background: #ffffff;
 }
 
 .history-icon {
   width: 32px;
   height: 32px;
-
-  /* macht das SVG einfärbbar */
   filter: brightness(0) saturate(100%)
-          invert(15%) sepia(10%) saturate(800%)
-          hue-rotate(180deg) brightness(90%);
-}
-
-.history-content {
-  min-width: 0;
+    invert(8%) sepia(25%) saturate(1100%)
+    hue-rotate(110deg) brightness(75%);
 }
 
 .history-name {
   margin: 0;
-  color: var(--text-main);
+  color: #061f16;
   font-weight: 900;
-  text-transform: capitalize;
 }
 
 .history-meta {
-  margin: 0.2rem 0 0 0;
-  color: var(--text-secondary);
+  margin: 0.2rem 0 0;
+  color: rgba(6, 31, 22, 0.68);
   font-size: 0.9rem;
 }
 
 .history-date {
-  color: var(--text-muted);
+  color: rgba(6, 31, 22, 0.52);
   font-size: 0.86rem;
   font-weight: 700;
 }
 
+/* EMPTY */
+
 .empty-state,
 .empty-mini-state {
   border-radius: 20px;
-  border: 1px dashed rgba(82, 91, 118, 0.2);
-  background: rgba(82, 91, 118, 0.03);
+  border: 1px dashed rgba(6, 31, 22, 0.18);
+  background: rgba(6, 31, 22, 0.03);
   text-align: center;
-  color: var(--text-secondary);
+  color: rgba(6, 31, 22, 0.72);
 }
 
 .empty-state {
@@ -330,65 +305,131 @@
   padding: 1.25rem 1rem;
 }
 
-.empty-icon {
-  font-size: 2rem;
-  margin-bottom: 0.7rem;
-}
-
 .empty-state h3 {
-  margin: 0 0 0.4rem 0;
-  color: var(--text-main);
+  margin: 0 0 0.4rem;
+  color: #061f16;
   font-weight: 900;
 }
 
-.empty-state p {
-  margin: 0;
-  line-height: 1.6;
+/* MOOD BUTTONS */
+
+.mood-button,
+.journal-mood-button {
+  background: #ffffff;
+
+  border: 2px solid rgba(6, 31, 22, 0.12);
+
+  color: #061f16;
+
+  transition: 0.2s ease;
 }
 
-.tone-happy {
-  border-left: 4px solid #7aa874;
+.mood-button:hover,
+.journal-mood-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 18px rgba(6, 31, 22, 0.12);
+
+  background: #1b3a2d;
+
+  color: #ffffff;
+
+  border-color: #1b3a2d;
 }
 
-.tone-sad {
-  border-left: 4px solid #6d7fa6;
+.mood-button.selected,
+.journal-mood-button.selected {
+  background: #061f16;
+
+  color: #ffffff;
+
+  border-color: #061f16;
 }
 
-.tone-anxious {
-  border-left: 4px solid #8f8b74;
+/* ICONS */
+
+.mood-icon,
+.mood-icon-large,
+.mood-icon-small,
+.journal-mood-icon,
+.empty-icon-img {
+  object-fit: contain;
+
+  display: block;
 }
 
-.tone-angry {
-  border-left: 4px solid #8d6671;
+.mood-icon {
+  width: 40px;
+  height: 40px;
 }
 
-.tone-calm {
-  border-left: 4px solid #7b84a5;
+.mood-icon-large {
+  width: 52px;
+  height: 52px;
 }
 
-.tone-stressed {
-  border-left: 4px solid #7f6984;
+.mood-icon-small {
+  width: 36px;
+  height: 36px;
 }
 
-.tone-excited {
-  border-left: 4px solid #7780a8;
+/* DEFAULT ICON COLOR */
+
+.journal-mood-icon,
+.mood-icon {
+  filter: brightness(0) saturate(100%)
+    invert(8%) sepia(25%) saturate(1100%)
+    hue-rotate(110deg) brightness(75%);
 }
 
-.tone-confused {
-  border-left: 4px solid #8a8f84;
+/* ICON WHITE ON HOVER */
+
+.mood-button:hover .mood-icon,
+.journal-mood-button:hover .journal-mood-icon {
+  filter: brightness(0) invert(1);
 }
 
-.tone-lonely {
-  border-left: 4px solid #7f8791;
+/* ICON WHITE WHEN SELECTED */
+
+.journal-mood-button.selected .journal-mood-icon,
+.mood-button.selected .mood-icon {
+  filter: brightness(0) invert(1);
 }
 
-.tone-sluggish {
-  border-left: 4px solid #8a8f98;
+/* SLIDER */
+
+.intensity-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #d7e6df 0%,
+    #5d8b76 50%,
+    #061f16 100%
+  );
 }
 
-.tone-default {
-  border-left: 4px solid var(--accent);
+.intensity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #061f16;
+  border: none;
 }
+
+.intensity-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #061f16;
+  border: none;
+}
+
+/* RESPONSIVE */
 
 @media (max-width: 1100px) {
   .dashboard-grid {
@@ -398,7 +439,6 @@
   .dashboard-side-column {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
   }
 }
 
@@ -410,11 +450,6 @@
 
   .dashboard-hero h1 {
     font-size: 1.85rem;
-  }
-
-  .dashboard-hero-badge {
-    align-items: flex-start;
-    min-width: unset;
   }
 
   .dashboard-side-column {
@@ -437,165 +472,4 @@
   .history-date {
     grid-column: 2;
   }
-}
-
-/* =========================
-   BASE ICON STYLE
-========================= */
-
-.mood-icon,
-.mood-icon-large,
-.mood-icon-small {
-  object-fit: contain;
-  display: block;
-  transition: 0.2s ease;
-}
-
-/* Größen */
-.mood-icon { width: 40px; height: 40px; }
-.mood-icon-large { width: 52px; height: 52px; }
-.mood-icon-small { width: 36px; height: 36px; }
-
-/* =========================
-   UNSELECTED STATE
-========================= */
-
-.mood-button,
-.journal-mood-button {
-  background: #2F3A55; /* dunkles blau */
-  border: 2px solid #cae0ec;
-  color: #cae0ec;
-  transition: 0.2s;
-}
-
-/* ICON = hellgrün */
-.mood-button .mood-icon,
-.journal-mood-button .journal-mood-icon {
-  filter: brightness(0) saturate(100%)
-          invert(90%) sepia(12%) saturate(200%)
-          hue-rotate(45deg) brightness(94%) contrast(92%);
-}
-
-/* =========================
-   SELECTED STATE
-========================= */
-
-.mood-button.selected,
-.journal-mood-button.selected {
-  background: #cae0ec; /* hellgrün */
-  color: #163352;
-  border: 2px solid #cae0ec;
-}
-
-/* ICON = dunkelblau */
-.mood-button.selected .mood-icon,
-.journal-mood-button.selected .journal-mood-icon {
-  filter: brightness(0) saturate(100%)
-          invert(15%) sepia(30%) saturate(1000%)
-          hue-rotate(200deg) brightness(88%) contrast(91%);
-}
-
-/* =========================
-   HOVER (optional aber nice)
-========================= */
-
-.mood-button:hover,
-.journal-mood-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(22, 51, 82, 0.2);
-}
-
-.empty-icon-img {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-}
-
-.intensity-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 16px;
-  border-radius: 999px;
-  outline: none;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  background: linear-gradient(
-    90deg,
-    #cae0ec 0%,
-    #59a9a1 35%,
-    #91b0bd 65%,
-    #3a7171 100%
-  );
-}
-
-/* Chrome / Edge / Safari */
-.intensity-slider::-webkit-slider-runnable-track {
-  height: 16px;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    #cae0ec 0%,
-    #59a9a1 35%,
-    #91b0bd 65%,
-    #3a7171 100%
-  );
-}
-
-.intensity-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #163352;
-  border: none;
-  margin-top: -4px;
-  box-shadow: 0 4px 10px rgba(22, 51, 82, 0.2);
-}
-
-/* Firefox */
-.intensity-slider::-moz-range-track {
-  height: 16px;
-  border-radius: 999px;
-  border: none;
-  background: linear-gradient(
-    90deg,
-    #cae0ec 0%,
-    #59a9a1 35%,
-    #91b0bd 65%,
-    #3a7171 100%
-  );
-}
-
-.intensity-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #163352;
-  border: none;
-  box-shadow: 0 4px 10px rgba(22, 51, 82, 0.2);
-}
-/* DEFAULT = dunkelblau Icons */
-.journal-mood-icon {
-  filter: brightness(0) saturate(100%)
-    invert(15%) sepia(10%) saturate(800%)
-    hue-rotate(180deg) brightness(40%);
-}
-
-/* HOVER = leicht heller (optional) */
-.journal-mood-button:hover .journal-mood-icon {
-  filter: brightness(0) saturate(100%)
-    invert(20%) sepia(10%) saturate(700%)
-    hue-rotate(180deg) brightness(55%);
-}
-
-/* SELECTED = hellgrün */
-.journal-mood-button.selected .journal-mood-icon {
-  filter: brightness(0) saturate(100%)
-    invert(90%) sepia(10%) saturate(200%)
-    hue-rotate(60deg) brightness(95%);
 }

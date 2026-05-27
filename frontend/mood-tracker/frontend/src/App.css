@@ -1,13 +1,13 @@
 :root {
   --primary: #163352;
-  --secondary: #3a7171;
-  --accent: #59a9a1;
-  --accent-soft: #cae0ec;
-  --accent-input: #cae0ec;
+  --secondary: #244636;
+  --accent: #1b3a2d;
+  --accent-soft: #f8f8f6;
+  --accent-input: #f8f8f6;
   --text: #163352;
   --text-h: #163352;
-  --text-muted: #3a7171;
-  --surface: #cae0ec;
+  --text-muted: #244636;
+  --surface: #f8f8f6;
   --surface-light: #ffffff;
   --border: rgba(22, 51, 82, 0.12);
   --accent-bg: rgba(89, 169, 161, 0.12);
@@ -23,7 +23,7 @@
 body {
   margin: 0;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #3a7171;
+  background: #244636;
   color: var(--text);
 }
 
@@ -366,7 +366,7 @@ body {
 
 /* Mood Tracker additions */
 .mood-tracker textarea {
-  background: #cae0ec;
+  background: #f8f8f6;
   border: 1px solid rgba(22, 51, 82, 0.1);
   border-radius: 12px;
   padding: 0.8rem;

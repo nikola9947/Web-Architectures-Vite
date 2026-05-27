@@ -1,36 +1,67 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { logoutUser } from '../services/api'
 import './Header.css'
 
-export default function Header({ user, onLogout }) {
+export default function Header({ user, setUser }) {
   const navigate = useNavigate()
 
-  const handleLogout = () => {
-    onLogout()
-    navigate('/login')
+  const handleLogout = async () => {
+    try {
+      await logoutUser()
+
+      setUser(null)
+
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
   }
 
   return (
     <header className="header">
       <div className="header-content">
-        <Link to="/dashboard" className="header-logo">
-          <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#283047"><path d="M773-676q13.6 0 22.8-10 9.2-10 9.2-22 0-13.6-9.2-22.8-9.2-9.2-22.8-9.2-13.6 0-22.8 9.2-9.2 9.2-9.2 22.8 0 12 9.2 22t22.8 10Zm-172 0q13.6 0 22.8-10 9.2-10 9.2-22 0-13.6-9.2-22.8-9.2-9.2-22.8-9.2-13.6 0-22.8 9.2-9.2 9.2-9.2 22.8 0 12 9.2 22t22.8 10Zm-22 146h214q0-33-33-51.5T686-600q-41 0-74 18.5T579-530ZM108.25-151Q40-221 40-315v-267h468v267q0 94-68.25 164T274-81q-97.5 0-165.75-70ZM397-193.5Q448-246 448-315v-207H100v207q0 69 51.16 121.5t123 52.5Q346-141 397-193.5ZM686-379q-34 0-66-8.5T559-412v-67q26 15 58.5 27.5T686-439q71.78 0 122.89-48T860-604v-216H509v189h-60v-249h471v276q0 93-68.25 159T686-379Zm-497-7q13.6 0 22.8-9.2 9.2-9.2 9.2-22.8 0-13.6-9.2-22.8-9.2-9.2-22.8-9.2-13.6 0-22.8 9.2-9.2 9.2-9.2 22.8 0 13.6 9.2 22.8 9.2 9.2 22.8 9.2Zm196-9.2q9-9.2 9-22.8 0-13.6-9.2-22.8-9.2-9.2-22.8-9.2-13.6 0-22.8 9.2-9.2 9.2-9.2 22.8 0 13.6 9 22.8 9 9.2 23 9.2t23-9.2Zm-34 145.7q33-18.5 33-51.5H170q0 33 33 51.5t74 18.5q41 0 74-18.5ZM275-336Zm410-289Z"/></svg>Mood Tracker
-        </Link>
-        
+
+        {/* LOGO */}
+        <NavLink to="/" className="header-logo">
+          MoodTracker
+        </NavLink>
+
+        {/* NAVIGATION */}
         <nav className="header-nav">
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/journal">Journal</Link>
-          <Link to="/skills">Skills</Link>
-          <Link to="/calendar">Calendar</Link>
+          <NavLink to="/">
+            Dashboard
+          </NavLink>
+
+          <NavLink to="/journal">
+            Journal
+          </NavLink>
+
+          <NavLink to="/skills">
+            Skills
+          </NavLink>
+
+          <NavLink to="/calendar">
+            Calendar
+          </NavLink>
         </nav>
 
-
+        {/* USER */}
         <div className="header-user">
-          <span className="user-name">{user?.username}</span>
-          <button className="logout-btn" onClick={handleLogout}>
+
+          {user && (
+            <span className="user-name">
+              {user.username || user.email}
+            </span>
+          )}
+
+          <button
+            className="logout-btn"
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </div>
+
       </div>
     </header>
   )

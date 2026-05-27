@@ -25,7 +25,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        {user && <Header />}
+        {user && <Header user={user} setUser={setUser} />}
 
         <main className="main-content">
           <Routes>

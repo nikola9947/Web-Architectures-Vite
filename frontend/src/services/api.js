@@ -113,3 +113,11 @@ export const markSkillAsPracticed = (skillId) => {
     { withCredentials: true }
   )
 }
+
+export const logoutUser = () => {
+  return axios.post(
+    `${API_BASE_URL}/auth/logout`,
+    {},
+    { withCredentials: true }
+  )
+}
