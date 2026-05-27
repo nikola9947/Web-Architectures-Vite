@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { getMoods, createMood, getSkillsForMood, addUserSkill } from '../services/api'
 import MoodTracker from '../components/MoodTracker'
 import './Dashboard.css'
 
-import happyIcon from "../assets/happy.svg"
-import sadIcon from "../assets/sad.svg"
-import anxiousIcon from "../assets/anxious.svg"
-import angryIcon from "../assets/angry.svg"
-import calmIcon from "../assets/calm.svg"
-import stressedIcon from "../assets/stressed.svg"
-import excitedIcon from "../assets/excited.svg"
-import confusedIcon from "../assets/confused.svg"
-import lonelyIcon from "../assets/lonely.svg"
-import sluggishIcon from "../assets/sluggish.svg"
-import leaveIcon from "../assets/leave.svg"
+import happyIcon from '../assets/happy.svg'
+import sadIcon from '../assets/sad.svg'
+import anxiousIcon from '../assets/anxious.svg'
+import angryIcon from '../assets/angry.svg'
+import calmIcon from '../assets/calm.svg'
+import stressedIcon from '../assets/stressed.svg'
+import excitedIcon from '../assets/excited.svg'
+import confusedIcon from '../assets/confused.svg'
+import lonelyIcon from '../assets/lonely.svg'
+import sluggishIcon from '../assets/sluggish.svg'
+import leaveIcon from '../assets/leave.svg'
 
 const MOOD_ICONS = {
   happy: happyIcon,
@@ -25,7 +26,7 @@ const MOOD_ICONS = {
   excited: excitedIcon,
   confused: confusedIcon,
   lonely: lonelyIcon,
-  sluggish: sluggishIcon,
+  sluggish: sluggishIcon
 }
 
 export default function Dashboard({ user }) {
@@ -33,20 +34,28 @@ export default function Dashboard({ user }) {
   const [recommendations, setRecommendations] = useState([])
   const [lastMood, setLastMood] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [addingSkillId, setAddingSkillId] = useState(null)
 
   useEffect(() => {
-    loadMoods()
+    loadDashboard()
   }, [])
 
-  const loadMoods = async () => {
+  const loadDashboard = async () => {
     try {
-      const response = await getMoods()
-      setMoods(response.data)
-      if (response.data.length > 0) {
-        setLastMood(response.data[0])
+      const moodResponse = await getMoods()
+      const moodList = moodResponse.data || []
+
+      setMoods(moodList)
+
+      if (moodList.length > 0) {
+        const newestMood = moodList[0]
+        setLastMood(newestMood)
+
+        const skillResponse = await getSkillsForMood(newestMood.mood)
+        setRecommendations(skillResponse.data || [])
       }
     } catch (error) {
-      console.error('Failed to load moods:', error)
+      console.error('Failed to load dashboard:', error)
     } finally {
       setLoading(false)
     }
@@ -57,11 +66,22 @@ export default function Dashboard({ user }) {
       await createMood(moodData.mood, moodData.intensity, moodData.notes)
 
       const skillResponse = await getSkillsForMood(moodData.mood)
-      setRecommendations(skillResponse.data)
+      setRecommendations(skillResponse.data || [])
 
-      await loadMoods()
+      await loadDashboard()
     } catch (error) {
       console.error('Failed to create mood:', error)
+    }
+  }
+
+  const handleAddSkill = async (skillId) => {
+    try {
+      setAddingSkillId(skillId)
+      await addUserSkill(skillId)
+    } catch (error) {
+      console.error('Failed to add skill:', error)
+    } finally {
+      setAddingSkillId(null)
     }
   }
 
@@ -78,6 +98,7 @@ export default function Dashboard({ user }) {
       lonely: 'tone-lonely',
       sluggish: 'tone-sluggish'
     }
+
     return map[mood] || 'tone-default'
   }
 
@@ -177,17 +198,25 @@ export default function Dashboard({ user }) {
         </div>
       </section>
 
-      {recommendations.length > 0 && (
-        <section className="card">
-          <div className="section-heading">
-            <div>
-              <p className="section-kicker">Helpful next steps</p>
-              <h2>Recommended skills</h2>
-            </div>
+      <section className="card">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Helpful next steps</p>
+            <h2>
+              {lastMood
+                ? `Recommended skills for ${lastMood.mood}`
+                : 'Recommended coping skills'}
+            </h2>
           </div>
 
+          <Link to="/skills" className="action-btn">
+            View all skills
+          </Link>
+        </div>
+
+        {recommendations.length > 0 ? (
           <div className="recommendation-list">
-            {recommendations.map((skill) => (
+            {recommendations.slice(0, 4).map((skill) => (
               <div key={skill.id} className="recommendation-item">
                 <div className="recommendation-text">
                   <h4>{skill.name}</h4>
@@ -196,15 +225,22 @@ export default function Dashboard({ user }) {
 
                 <button
                   className="action-btn"
-                  onClick={() => addUserSkill(skill.id).catch((err) => console.error(err))}
+                  onClick={() => handleAddSkill(skill.id)}
+                  disabled={addingSkillId === skill.id}
                 >
-                  Add skill
+                  {addingSkillId === skill.id ? 'Adding...' : 'Add skill'}
                 </button>
               </div>
             ))}
           </div>
-        </section>
-      )}
+        ) : (
+          <div className="empty-mini-state">
+            <p>
+              Track a mood first and matching coping skills will appear here.
+            </p>
+          </div>
+        )}
+      </section>
 
       <section className="card">
         <div className="section-heading">
@@ -217,14 +253,17 @@ export default function Dashboard({ user }) {
         {moods.length > 0 ? (
           <div className="history-list">
             {moods.slice(0, 6).map((mood) => (
-              <div key={mood.id} className={`history-item ${getMoodToneClass(mood.mood)}`}>
-              <div className="history-emoji">
-                <img
-                  src={MOOD_ICONS[mood.mood]}
-                  alt={mood.mood}
-                  className="history-icon"
-                />
-              </div>
+              <div
+                key={mood.id}
+                className={`history-item ${getMoodToneClass(mood.mood)}`}
+              >
+                <div className="history-emoji">
+                  <img
+                    src={MOOD_ICONS[mood.mood]}
+                    alt={mood.mood}
+                    className="history-icon"
+                  />
+                </div>
 
                 <div className="history-content">
                   <p className="history-name">{mood.mood}</p>
