@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import Dashboard from './pages/Dashboard'
@@ -9,9 +9,15 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import Header from './components/Header'
 
+import { getCurrentUser } from './services/api'
+
 import './App.css'
 
-function ProtectedRoute({ user, children }) {
+function ProtectedRoute({ user, loading, children }) {
+  if (loading) {
+    return <div className="loading">Loading...</div>
+  }
+
   if (!user) {
     return <Navigate to="/login" replace />
   }
@@ -21,6 +27,22 @@ function ProtectedRoute({ user, children }) {
 
 export default function App() {
   const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadCurrentUser = async () => {
+      try {
+        const response = await getCurrentUser()
+        setUser(response.data.user)
+      } catch (error) {
+        setUser(null)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadCurrentUser()
+  }, [])
 
   return (
     <BrowserRouter>
@@ -32,21 +54,33 @@ export default function App() {
             <Route
               path="/login"
               element={
-                user ? <Navigate to="/" replace /> : <LoginPage onLogin={setUser} />
+                loading ? (
+                  <div className="loading">Loading...</div>
+                ) : user ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <LoginPage onLogin={setUser} />
+                )
               }
             />
 
             <Route
               path="/register"
               element={
-                user ? <Navigate to="/" replace /> : <RegisterPage onLogin={setUser} />
+                loading ? (
+                  <div className="loading">Loading...</div>
+                ) : user ? (
+                  <Navigate to="/" replace />
+                ) : (
+                  <RegisterPage onLogin={setUser} />
+                )
               }
             />
 
             <Route
               path="/"
               element={
-                <ProtectedRoute user={user}>
+                <ProtectedRoute user={user} loading={loading}>
                   <Dashboard user={user} />
                 </ProtectedRoute>
               }
@@ -55,7 +89,7 @@ export default function App() {
             <Route
               path="/journal"
               element={
-                <ProtectedRoute user={user}>
+                <ProtectedRoute user={user} loading={loading}>
                   <JournalPage user={user} />
                 </ProtectedRoute>
               }
@@ -64,7 +98,7 @@ export default function App() {
             <Route
               path="/skills"
               element={
-                <ProtectedRoute user={user}>
+                <ProtectedRoute user={user} loading={loading}>
                   <SkillsPage user={user} />
                 </ProtectedRoute>
               }
@@ -73,7 +107,7 @@ export default function App() {
             <Route
               path="/calendar"
               element={
-                <ProtectedRoute user={user}>
+                <ProtectedRoute user={user} loading={loading}>
                   <CalendarPage user={user} />
                 </ProtectedRoute>
               }

@@ -7,9 +7,11 @@ import { Server } from 'socket.io'
 
 import authRoutes from './routes/auth.js'
 import moodRoutes from './routes/moods.js'
-import entryRoutes from './routes/entries.js'
 import skillRoutes from './routes/skills.js'
 import eventRoutes from './routes/events.js'
+
+// NEU: Journal Modul statt alter entries.js
+import journalRoutes from './modules/journal/journal.routes.js'
 
 dotenv.config()
 
@@ -33,7 +35,7 @@ app.use(cookieParser())
 
 app.use('/api/auth', authRoutes)
 app.use('/api/moods', moodRoutes)
-app.use('/api/entries', entryRoutes)
+app.use('/api/entries', journalRoutes)
 app.use('/api/skills', skillRoutes)
 app.use('/api/events', eventRoutes)
 

@@ -22,12 +22,16 @@ export const registerUser = (username, email, password) => {
   )
 }
 
-/* ===============================
-   USER
-================================= */
+export const logoutUser = () => {
+  return axios.post(
+    `${API_BASE_URL}/auth/logout`,
+    {},
+    { withCredentials: true }
+  )
+}
 
 export const getCurrentUser = () => {
-  return axios.get(`${API_BASE_URL}/users/me`, {
+  return axios.get(`${API_BASE_URL}/auth/me`, {
     withCredentials: true
   })
 }
@@ -37,7 +41,9 @@ export const getCurrentUser = () => {
 ================================= */
 
 export const getMoods = () => {
-  return axios.get(`${API_BASE_URL}/moods`, { withCredentials: true })
+  return axios.get(`${API_BASE_URL}/moods`, {
+    withCredentials: true
+  })
 }
 
 export const createMood = (mood, intensity, notes) => {
@@ -48,8 +54,14 @@ export const createMood = (mood, intensity, notes) => {
   )
 }
 
+/* ===============================
+   JOURNAL ENTRIES
+================================= */
+
 export const getEntries = () => {
-  return axios.get(`${API_BASE_URL}/entries`, { withCredentials: true })
+  return axios.get(`${API_BASE_URL}/entries`, {
+    withCredentials: true
+  })
 }
 
 export const createEntry = (title, content, mood) => {
@@ -73,16 +85,21 @@ export const deleteEntry = (id) => {
     withCredentials: true
   })
 }
+
 /* ===============================
    SKILLS
 ================================= */
 
 export const getAllSkills = () => {
-  return axios.get(`${API_BASE_URL}/skills`)
+  return axios.get(`${API_BASE_URL}/skills`, {
+    withCredentials: true
+  })
 }
 
 export const getSkillsForMood = (mood) => {
-  return axios.get(`${API_BASE_URL}/skills/for-mood/${mood}`)
+  return axios.get(`${API_BASE_URL}/skills/for-mood/${mood}`, {
+    withCredentials: true
+  })
 }
 
 export const getUserSkills = () => {
@@ -100,23 +117,14 @@ export const addUserSkill = (skillId) => {
 }
 
 export const removeUserSkill = (skillId) => {
-  return axios.delete(
-    `${API_BASE_URL}/skills/my-skills/${skillId}`,
-    { withCredentials: true }
-  )
+  return axios.delete(`${API_BASE_URL}/skills/my-skills/${skillId}`, {
+    withCredentials: true
+  })
 }
 
 export const markSkillAsPracticed = (skillId) => {
   return axios.post(
     `${API_BASE_URL}/skills/my-skills/${skillId}/practice`,
-    {},
-    { withCredentials: true }
-  )
-}
-
-export const logoutUser = () => {
-  return axios.post(
-    `${API_BASE_URL}/auth/logout`,
     {},
     { withCredentials: true }
   )
