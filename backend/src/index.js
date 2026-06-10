@@ -9,8 +9,6 @@ import authRoutes from './routes/auth.js'
 import moodRoutes from './routes/moods.js'
 import skillRoutes from './routes/skills.js'
 import eventRoutes from './routes/events.js'
-
-// NEU: Journal Modul statt alter entries.js
 import journalRoutes from './modules/journal/journal.routes.js'
 
 dotenv.config()
@@ -18,12 +16,15 @@ dotenv.config()
 const app = express()
 
 const allowedOrigins = [
+  process.env.FRONTEND_ORIGIN,
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
   'http://localhost:5176',
-  'http://localhost:5177'
-]
+  'http://localhost:5177',
+  'https://www.your-mood-tracker.de',
+  'https://your-mood-tracker.de'
+].filter(Boolean)
 
 app.use(cors({
   origin: allowedOrigins,
@@ -60,8 +61,14 @@ io.on('connection', (socket) => {
   })
 })
 
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Mood Tracker API is running'
+  })
+})
+
 const PORT = process.env.PORT || 3001
 
 httpServer.listen(PORT, () => {
-  console.log(`✅ Server läuft auf http://localhost:${PORT}`)
+  console.log(`✅ Server läuft auf Port ${PORT}`)
 })
