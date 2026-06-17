@@ -535,3 +535,227 @@ Durch die Aufteilung in Bounded Contexts und die Einführung eines Service Layer
 Die Trennung von Frontend, Backend und Datenbank erleichtert zukünftige Erweiterungen sowie ein Deployment in produktiven Umgebungen.
 
 Die modulare Struktur ermöglicht außerdem eine spätere Migration einzelner Bereiche in eigenständige Services.
+
+## Deployment-Überblick
+
+| Bestandteil | Läuft als | Hostname / Pfad | Wird ausgeliefert von |
+|---|---|---|---|
+| Frontend (React) | Statisches Build (`dist/`) | `https://DEINE-DOMAIN.de` | Express mit `express.static` |
+| Backend (Express) | Node.js-App | `https://DEINE-DOMAIN.de/api` | konsoleH Node.js |
+| Datenbank (SQL) | MySQL/MariaDB | `localhost` auf dem Server | konsoleH DB-Verwaltung |
+
+Das Frontend wird als Production-Build erstellt und vom Express-Backend statisch ausgeliefert. API-Routen liegen weiterhin unter /api. Für clientseitige React-Routen wird ein SPA-Fallback auf index.html genutzt.
+
+## 4a. Datenbankumstellung für Hetzner
+
+Lokal verwendet die Anwendung aktuell SQLite:
+
+```prisma
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+## 5. Backend als Node.js-App konfigurieren
+
+Für das Deployment wird die gesamte Anwendung als eine Node.js-App betrieben. Das bedeutet: Express liefert sowohl die API unter `/api/...` als auch das gebaute React-Frontend aus `frontend/dist` aus.
+
+### Port-Konfiguration
+
+In einer Hosting-Umgebung wie Hetzner Webhosting L gibt die Plattform den Port vor. Deshalb darf der Server nicht fest auf `3001` oder `3000` lauschen.
+
+Im Backend wird deshalb verwendet:
+
+```js
+const PORT = process.env.PORT || 3001
+
+httpServer.listen(PORT, () => {
+  console.log(`Server läuft auf Port ${PORT}`)
+})
+
+
+## 6. Hochladen, installieren und migrieren
+
+Da die Anwendung als All-in-One Node.js-App deployed wird, liefert Express sowohl die API als auch das React-Frontend aus. Deshalb wird nur ein Verzeichnis auf dem Server betrieben: das Backend mit dem fertigen Frontend-Build im `public/`-Ordner.
+
+### Lokale Vorbereitung
+
+Zuerst wird das Frontend gebaut:
+
+```bash
+cd frontend
+npm run build
+```
+
+Danach wird der Inhalt des `dist/`-Ordners in den `public/`-Ordner des Backends kopiert:
+
+```bash
+cp -r dist/* ../backend/public/
+```
+
+Unter Windows kann alternativ PowerShell verwendet werden:
+
+```powershell
+cd frontend
+npm run build
+
+Remove-Item -Recurse -Force ..\backend\public\*
+Copy-Item -Recurse -Force .\dist\* ..\backend\public\
+```
+
+Der Express-Server liefert anschließend den Inhalt aus `backend/public/` statisch aus.
+
+### Deployment auf dem Server
+
+Auf dem Server wird der Backend-Code in das Arbeitsverzeichnis der Hauptdomain geladen:
+
+```bash
+cd ~/your-mood-tracker.de
+git clone <repository-url> .
+```
+
+Falls `backend/public/` nicht im Git-Repository enthalten ist, wird der gebaute Frontend-Inhalt separat per SFTP oder SCP nach `backend/public/` hochgeladen.
+
+### Produktionsabhängigkeiten installieren
+
+Auf dem Server werden die Abhängigkeiten reproduzierbar installiert:
+
+```bash
+npm ci
+```
+
+`npm ci` verwendet exakt die Versionen aus der `package-lock.json` und ist deshalb besser für Deployments geeignet als `npm install`.
+
+### Prisma vorbereiten
+
+Danach wird der Prisma Client erzeugt:
+
+```bash
+npx prisma generate
+```
+
+### Migrationen auf Produktionsdatenbank ausführen
+
+Für die Live-Datenbank wird verwendet:
+
+```bash
+npx prisma migrate deploy
+```
+
+In Produktion wird bewusst nicht `prisma migrate dev` genutzt, weil dieser Befehl für Entwicklung gedacht ist und Datenbanken zurücksetzen oder neue Migrationen erzeugen kann.
+
+### Neustart
+
+Nach Installation, Migration und Setzen der Umgebungsvariablen wird die Node.js-App in konsoleH neu gestartet.
+
+### Tests nach dem Deployment
+
+Nach dem Neustart werden folgende Punkte geprüft:
+
+| Test                                          | Erwartung                                       |
+| --------------------------------------------- | ----------------------------------------------- |
+| `https://www.your-mood-tracker.de`            | React-App wird angezeigt                        |
+| `https://www.your-mood-tracker.de/login`      | Direkter Aufruf funktioniert durch SPA-Fallback |
+| `https://www.your-mood-tracker.de/api/health` | Backend antwortet                               |
+| Login                                         | Cookie wird gesetzt                             |
+| Geschützte Routen                             | Daten werden geladen                            |
+| Logout                                        | Cookie wird gelöscht                            |
+
+
+Der All-in-One-Build wurde lokal getestet. Das Frontend wurde mit `npm run build` gebaut und in `backend/public` kopiert. Express liefert die React-App über `http://localhost:3001` aus, während die API weiterhin unter `/api/...` erreichbar ist. Der direkte Aufruf von `/login` funktioniert durch den SPA-Fallback.
+
+## 7. Cookies und Authentifizierung in der All-in-One-Architektur
+
+In der All-in-One-Variante laufen Frontend und Backend über dieselbe Domain. Das React-Frontend wird von Express statisch ausgeliefert und die API liegt unter `/api`.
+
+Beispiel:
+
+```txt
+https://www.your-mood-tracker.de
+https://www.your-mood-tracker.de/api/health
+```
+
+### Warum entfällt CORS?
+
+CORS ist nur notwendig, wenn Browser-Anfragen von einer anderen Origin kommen. In dieser Architektur kommen Frontend und API von derselben Origin.
+
+Deshalb ist keine spezielle CORS-Konfiguration für die Kommunikation zwischen Frontend und API notwendig.
+
+### Cookie-Konfiguration
+
+Der Login setzt einen JWT als HttpOnly-Cookie:
+
+```js
+res.cookie('token', token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/',
+  maxAge: 7 * 24 * 60 * 60 * 1000
+})
+```
+
+### Warum HttpOnly?
+
+`httpOnly: true` verhindert, dass JavaScript im Browser den Token auslesen kann. Das schützt den JWT besser vor XSS-Angriffen.
+
+### Warum secure abhängig von NODE_ENV?
+
+In Produktion läuft die Anwendung über HTTPS. Deshalb soll der Cookie dort nur verschlüsselt übertragen werden.
+
+Lokal wird über HTTP getestet. Deshalb wird `secure` nur in Produktion aktiviert:
+
+```js
+secure: process.env.NODE_ENV === 'production'
+```
+
+### Warum SameSite Lax?
+
+`sameSite: 'lax'` reicht aus, weil Frontend und API auf derselben Domain laufen. Es ist kein `SameSite=None` notwendig, da keine Cross-Site-Requests verwendet werden.
+
+`SameSite=None` wäre nur nötig, wenn Frontend und Backend auf komplett unterschiedlichen Sites liegen würden. Für diese Architektur wäre es unnötig schwächer.
+
+### Logout
+
+Beim Logout muss der Cookie mit denselben Attributen gelöscht werden:
+
+```js
+res.clearCookie('token', {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/'
+})
+```
+
+Wenn die Attribute nicht übereinstimmen, kann es passieren, dass der Browser den Cookie nicht richtig entfernt.
+
+### Trust Proxy
+
+Da die Node.js-App auf Hetzner hinter einem Apache-Reverse-Proxy läuft, wird in Express gesetzt:
+
+```js
+app.set('trust proxy', 1)
+```
+
+Dadurch kann Express korrekt erkennen, dass die ursprüngliche Anfrage über HTTPS kam.
+
+### Frontend Requests
+
+Bei Same-Origin-Anfragen sendet der Browser Cookies standardmäßig mit. Deshalb ist `credentials: 'include'` nicht zwingend notwendig. Da die App bereits mit Axios und `withCredentials: true` arbeitet, kann diese Einstellung aber bleiben.
+
+### Test
+
+Der Auth-Flow wurde lokal über die All-in-One-App getestet:
+
+```txt
+http://localhost:3001
+```
+
+Geprüft wurde:
+
+* Registrierung funktioniert
+* Login setzt einen Cookie
+* geschützte API-Routen laden Daten
+* Logout löscht den Cookie
+* Weiterleitung zur Login-Seite funktioniert

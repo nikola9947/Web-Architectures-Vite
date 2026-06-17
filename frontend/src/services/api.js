@@ -1,89 +1,90 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'http://localhost:3001/api'
+const API_BASE_URL = '/api'
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
 
 /* ===============================
    AUTH
 ================================= */
 
-export const loginUser = (email, password) => {
-  return axios.post(
-    `${API_BASE_URL}/auth/login`,
-    { email, password },
-    { withCredentials: true }
-  )
+export const loginUser = (emailOrData, password) => {
+  const payload =
+    typeof emailOrData === 'object'
+      ? emailOrData
+      : { email: emailOrData, password }
+
+  return api.post('/auth/login', payload)
 }
 
-export const registerUser = (username, email, password) => {
-  return axios.post(
-    `${API_BASE_URL}/auth/register`,
-    { username, email, password },
-    { withCredentials: true }
-  )
+export const registerUser = (usernameOrData, email, password) => {
+  const payload =
+    typeof usernameOrData === 'object'
+      ? usernameOrData
+      : { username: usernameOrData, email, password }
+
+  return api.post('/auth/register', payload)
 }
 
 export const logoutUser = () => {
-  return axios.post(
-    `${API_BASE_URL}/auth/logout`,
-    {},
-    { withCredentials: true }
-  )
+  return api.post('/auth/logout')
 }
 
 export const getCurrentUser = () => {
-  return axios.get(`${API_BASE_URL}/auth/me`, {
-    withCredentials: true
-  })
+  return api.get('/auth/me')
 }
 
 /* ===============================
-   MOODS
+   MOODS / DASHBOARD
 ================================= */
 
 export const getMoods = () => {
-  return axios.get(`${API_BASE_URL}/moods`, {
-    withCredentials: true
-  })
+  return api.get('/moods')
 }
 
-export const createMood = (mood, intensity, notes) => {
-  return axios.post(
-    `${API_BASE_URL}/moods`,
-    { mood, intensity, notes },
-    { withCredentials: true }
-  )
+export const createMood = (moodOrData, intensity, notes) => {
+  const payload =
+    typeof moodOrData === 'object'
+      ? moodOrData
+      : { mood: moodOrData, intensity, notes }
+
+  return api.post('/moods', payload)
 }
 
 /* ===============================
-   JOURNAL ENTRIES
+   JOURNAL
 ================================= */
 
 export const getEntries = () => {
-  return axios.get(`${API_BASE_URL}/entries`, {
-    withCredentials: true
-  })
+  return api.get('/entries')
 }
 
-export const createEntry = (title, content, mood) => {
-  return axios.post(
-    `${API_BASE_URL}/entries`,
-    { title, content, mood },
-    { withCredentials: true }
-  )
+export const createEntry = (titleOrData, content, mood) => {
+  const payload =
+    typeof titleOrData === 'object'
+      ? titleOrData
+      : { title: titleOrData, content, mood }
+
+  return api.post('/entries', payload)
 }
 
-export const updateEntry = (id, title, content, mood) => {
-  return axios.put(
-    `${API_BASE_URL}/entries/${id}`,
-    { title, content, mood },
-    { withCredentials: true }
-  )
+export const updateEntry = (id, titleOrData, content, mood) => {
+  const payload =
+    typeof titleOrData === 'object'
+      ? titleOrData
+      : { title: titleOrData, content, mood }
+
+  return api.put(`/entries/${id}`, payload)
 }
 
 export const deleteEntry = (id) => {
-  return axios.delete(`${API_BASE_URL}/entries/${id}`, {
-    withCredentials: true
-  })
+  return api.delete(`/entries/${id}`)
 }
 
 /* ===============================
@@ -91,41 +92,33 @@ export const deleteEntry = (id) => {
 ================================= */
 
 export const getAllSkills = () => {
-  return axios.get(`${API_BASE_URL}/skills`, {
-    withCredentials: true
-  })
+  return api.get('/skills')
 }
 
 export const getSkillsForMood = (mood) => {
-  return axios.get(`${API_BASE_URL}/skills/for-mood/${mood}`, {
-    withCredentials: true
-  })
+  return api.get(`/skills/for-mood/${mood}`)
 }
 
 export const getUserSkills = () => {
-  return axios.get(`${API_BASE_URL}/skills/my-skills`, {
-    withCredentials: true
-  })
+  return api.get('/skills/my-skills')
 }
 
 export const addUserSkill = (skillId) => {
-  return axios.post(
-    `${API_BASE_URL}/skills/my-skills/${skillId}`,
-    {},
-    { withCredentials: true }
-  )
+  return api.post(`/skills/my-skills/${skillId}`, {})
 }
 
 export const removeUserSkill = (skillId) => {
-  return axios.delete(`${API_BASE_URL}/skills/my-skills/${skillId}`, {
-    withCredentials: true
-  })
+  return api.delete(`/skills/my-skills/${skillId}`)
 }
 
 export const markSkillAsPracticed = (skillId) => {
-  return axios.post(
-    `${API_BASE_URL}/skills/my-skills/${skillId}/practice`,
-    {},
-    { withCredentials: true }
-  )
+  return api.post(`/skills/my-skills/${skillId}/practice`, {})
+}
+
+/* ===============================
+   EVENTS / CALENDAR
+================================= */
+
+export const getEvents = () => {
+  return api.get('/events')
 }

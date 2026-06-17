@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { loginUser } from '../services/api'
+import { loginUser, getCurrentUser } from '../services/api'
 import './AuthPage.css'
 
 export default function LoginPage({ onLogin }) {
@@ -16,9 +16,11 @@ export default function LoginPage({ onLogin }) {
     setError('')
 
     try {
-      const res = await loginUser(email, password)
+      await loginUser(email, password)
 
-      onLogin(res.data.user)
+      // Verify the session was created by fetching current user
+      const userRes = await getCurrentUser()
+      onLogin(userRes.data.user)
 
       navigate('/')
     } catch (err) {

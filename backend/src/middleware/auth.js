@@ -20,17 +20,12 @@ export const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization
   let token = null
 
+  // Try to get token from Authorization header first (Bearer token)
   if (authHeader?.startsWith('Bearer ')) {
     token = authHeader.split(' ')[1]
-  } else if (req.headers.cookie) {
-    const cookieToken = req.headers.cookie
-      .split(';')
-      .map((cookie) => cookie.trim())
-      .find((cookie) => cookie.startsWith('token='))
-
-    if (cookieToken) {
-      token = cookieToken.split('=')[1]
-    }
+  } else if (req.cookies?.token) {
+    // Fall back to cookie
+    token = req.cookies.token
   }
 
   if (!token) {

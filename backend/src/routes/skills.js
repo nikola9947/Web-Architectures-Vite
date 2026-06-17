@@ -29,9 +29,9 @@ router.get('/for-mood/:mood', async (req, res) => {
 });
 
 // Get user's tracked skills
-router.get('/my-skills', async (req, res) => {
+router.get('/my-skills', authenticateToken, async (req, res) => {
   try {
-    const userId = 1
+    const userId = req.user.id
     const userSkills = await dbAll(`
       SELECT s.*, us.practiced_count, us.last_practiced
       FROM skills s
@@ -46,9 +46,9 @@ router.get('/my-skills', async (req, res) => {
 });
 
 // Add skill to user's list
-router.post('/my-skills/:skillId', async (req, res) => {
+router.post('/my-skills/:skillId', authenticateToken, async (req, res) => {
   try {
-    const userId = 1
+    const userId = req.user.id
     const skillId = req.params.skillId
 
     const skill = await dbGet('SELECT * FROM skills WHERE id = ?', [skillId])
@@ -77,9 +77,9 @@ router.post('/my-skills/:skillId', async (req, res) => {
 });
 
 // Remove skill from user's list
-router.delete('/my-skills/:skillId', async (req, res) => {
+router.delete('/my-skills/:skillId', authenticateToken, async (req, res) => {
   try {
-    const userId = 1
+    const userId = req.user.id
     const skillId = req.params.skillId
 
     await dbRun(
@@ -94,9 +94,9 @@ router.delete('/my-skills/:skillId', async (req, res) => {
 });
 
 // Mark skill as practiced
-router.post('/my-skills/:skillId/practice', async (req, res) => {
+router.post('/my-skills/:skillId/practice', authenticateToken, async (req, res) => {
   try {
-    const userId = 1
+    const userId = req.user.id
     const skillId = req.params.skillId
 
     await dbRun(

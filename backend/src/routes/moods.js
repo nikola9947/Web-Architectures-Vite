@@ -5,9 +5,9 @@ import { authenticateToken } from '../middleware/auth.js';
 const router = express.Router();
 
 // Get all mood entries for a user
-router.get('/', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const userId = 1; // Temporary: no auth
+    const userId = req.user.id;
     const moods = await dbAll(
       'SELECT * FROM mood_entries WHERE user_id = ? ORDER BY created_at DESC',
       [userId]
@@ -19,9 +19,9 @@ router.get('/', async (req, res) => {
 });
 
 // Get mood entries for a specific date range
-router.get('/range/:startDate/:endDate', async (req, res) => {
+router.get('/range/:startDate/:endDate', authenticateToken, async (req, res) => {
   try {
-    const userId = 1; // Temporary: no auth
+    const userId = req.user.id;
     const { startDate, endDate } = req.params;
     const moods = await dbAll(
       'SELECT * FROM mood_entries WHERE user_id = ? AND DATE(created_at) BETWEEN ? AND ? ORDER BY created_at DESC',
@@ -34,9 +34,9 @@ router.get('/range/:startDate/:endDate', async (req, res) => {
 });
 
 // Get mood statistics
-router.get('/stats/summary', async (req, res) => {
+router.get('/stats/summary', authenticateToken, async (req, res) => {
   try {
-    const userId = 1; // Temporary: no auth
+    const userId = req.user.id;
     const stats = await dbGet(`
       SELECT 
         mood,
@@ -55,9 +55,9 @@ router.get('/stats/summary', async (req, res) => {
 });
 
 // Create a new mood entry
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
-    const userId = 1; // Temporary: no auth
+    const userId = req.user.id;
     const { mood, intensity, notes } = req.body;
 
     if (!mood || !intensity) {
@@ -85,9 +85,9 @@ router.post('/', async (req, res) => {
 });
 
 // Update a mood entry.
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   try {
-    const userId = 1; // Temporary: no auth
+    const userId = req.user.id;
     const moodId = req.params.id;
     const { mood, intensity, notes } = req.body;
 
@@ -114,9 +114,9 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete a mood entry
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
-    const userId = 1; // Temporary: no auth
+    const userId = req.user.id;
     const moodId = req.params.id;
 
     const entry = await dbGet(
