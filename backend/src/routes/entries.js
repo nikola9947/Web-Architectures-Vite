@@ -16,7 +16,7 @@ function resolveMoodValue(body) {
 // Get all journal entries
 router.get('/', async (req, res) => {
   try {
-    const userId = 1 // Temporary: no auth
+    const userId = req.user.id // Temporary: no auth
 
     const entries = await dbAll(
       `
@@ -45,7 +45,7 @@ router.get('/', async (req, res) => {
 // Get specific journal entry
 router.get('/:id', async (req, res) => {
   try {
-    const userId = 1
+    const userId = req.user.id
     const entryId = req.params.id
 
     const entry = await dbGet(
@@ -78,7 +78,7 @@ router.get('/:id', async (req, res) => {
 // Create journal entry
 router.post('/', async (req, res) => {
   try {
-    const userId = 1
+    const userId = req.user.id
     const { title, content } = req.body
     const mood = resolveMoodValue(req.body)
 
@@ -125,7 +125,7 @@ router.post('/', async (req, res) => {
 // Update journal entry
 router.put('/:id', async (req, res) => {
   try {
-    const userId = 1
+    const userId = req.user.id
     const entryId = req.params.id
     const { title, content } = req.body
     const mood = resolveMoodValue(req.body)
@@ -189,7 +189,7 @@ router.put('/:id', async (req, res) => {
 // Delete journal entry
 router.delete('/:id', async (req, res) => {
   try {
-    const userId = 1
+    const userId = req.user.id
     const entryId = req.params.id
 
     const entry = await dbGet(

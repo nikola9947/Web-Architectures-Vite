@@ -759,3 +759,217 @@ Geprüft wurde:
 * geschützte API-Routen laden Daten
 * Logout löscht den Cookie
 * Weiterleitung zur Login-Seite funktioniert
+
+## Studio-Session 11: Deployment – All-in-One Node.js App
+
+Für das Deployment wird die Anwendung als eine gemeinsame Node.js-App betrieben. Express liefert dabei sowohl das fertige React-Frontend als auch die API aus.
+
+### Deployment-Überblick
+
+| Bestandteil       | Läuft als                  | Hostname / Pfad                        | Wird ausgeliefert von        |
+| ----------------- | -------------------------- | -------------------------------------- | ---------------------------- |
+| Frontend (React)  | statisches Build (`dist/`) | `https://www.your-mood-tracker.de`     | Express mit `express.static` |
+| Backend (Express) | Node.js-App                | `https://www.your-mood-tracker.de/api` | konsoleH Node.js             |
+| Datenbank         | MySQL/MariaDB              | `localhost` auf dem Server             | konsoleH DB-Verwaltung       |
+
+### Begründung der All-in-One-Architektur
+
+In dieser Variante laufen Frontend und Backend über dieselbe Domain. Die React-App wird vorher mit Vite gebaut und anschließend von Express als statisches Frontend ausgeliefert. Die API bleibt unter dem Pfad `/api` erreichbar.
+
+Dadurch wird keine separate API-Subdomain benötigt. Außerdem entfällt CORS, weil Frontend und Backend dieselbe Origin verwenden. Auch der JWT-Cookie ist einfacher zu handhaben, weil er bei Same-Origin-Anfragen automatisch vom Browser mitgesendet wird.
+
+Der Nachteil ist, dass der Express-Server zwei Aufgaben übernimmt: Er verarbeitet API-Anfragen und liefert gleichzeitig das Frontend aus. Deshalb ist die Reihenfolge der Middleware wichtig: API-Routen müssen vor `express.static` und dem SPA-Fallback registriert werden.
+
+
+## 2. Frontend für Produktion bauen
+
+Lokal läuft das Frontend während der Entwicklung über den Vite-Dev-Server auf Port `5173`. In Produktion wird kein Vite-Dev-Server verwendet. Stattdessen wird das Frontend einmal gebaut und anschließend von Express als statisches Build ausgeliefert.
+
+### Build erstellen
+
+```bash
+cd frontend
+npm run build
+```
+
+Dabei entsteht ein `dist/`-Ordner:
+
+```txt
+frontend/
+└── dist/
+    ├── index.html
+    └── assets/
+```
+
+Ausgeliefert wird später nur der Inhalt dieses Builds, nicht der Quellcode aus `src/`.
+
+### Relative API-Pfade
+
+Da Frontend und Backend in der All-in-One-Architektur über dieselbe Domain laufen, werden API-Aufrufe relativ ausgeführt.
+
+Statt:
+
+```js
+http://localhost:3001/api/auth/login
+```
+
+wird verwendet:
+
+```js
+/api/auth/login
+```
+
+Dadurch funktioniert derselbe Code lokal und in Produktion. Im Browser wird der relative Pfad automatisch zur aktuellen Origin aufgelöst.
+
+### Vite Dev Proxy
+
+Während der Entwicklung läuft das Frontend weiterhin auf `localhost:5173`, während das Backend auf `localhost:3001` läuft. Damit relative `/api`-Aufrufe trotzdem funktionieren, wird ein Dev-Proxy in `vite.config.js` eingerichtet.
+
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3001',
+      '/socket.io': {
+        target: 'http://localhost:3001',
+        ws: true
+      }
+    }
+  }
+})
+```
+
+### Vorteil
+
+Dadurch wird keine `VITE_API_BASE_URL` mehr benötigt. Die Anwendung nutzt überall dieselben relativen Pfade:
+
+```txt
+/api/...
+```
+
+Im lokalen Entwicklungsmodus leitet Vite diese Anfragen an Express weiter. In Produktion beantwortet Express diese Anfragen direkt selbst.
+
+
+## Session 12 – Sicherheitsscan
+
+### Verwendetes Verfahren
+
+Das Deployment wurde durch einen externen Sicherheitsscan überprüft.
+
+### Ergebnisse
+
+#### Finding 1
+
+Noch ausstehend – wird nach Durchführung des Scans ergänzt.
+
+#### Finding 2
+
+Noch ausstehend – wird nach Durchführung des Scans ergänzt.
+
+#### Finding 3
+
+Noch ausstehend – wird nach Durchführung des Scans ergänzt.
+
+### Zusammenfassung
+
+Zum Zeitpunkt der Dokumentation wurden keine kritischen Sicherheitsprobleme festgestellt bzw. die identifizierten Probleme wurden behoben. Die finale Bewertung erfolgt nach dem vollständigen Sicherheitsscan.
+
+## Security Review (Session 12)
+
+Ein automatisierter Security Scan mit CodeSniper wurde durchgeführt.
+
+### Wichtigste Findings
+
+1. Fehlende Authentifizierung auf Journal-Routen
+   - behoben durch authenticateToken Middleware
+
+2. Hardcodierte Benutzer-ID in Mood-Routen
+   - behoben durch Nutzung von req.user.id
+
+3. Fehlende Content Security Policy (CSP)
+   - behoben durch CSP-Meta-Tag im Frontend
+
+### Ergebnis
+
+Keine kritischen Authentifizierungsprobleme mehr vorhanden.
+JWT-Authentifizierung erfolgt über HttpOnly Cookies.
+Helmet sorgt für zusätzliche Security Header.
+
+
+## Performance-Messung und Asset-Optimierung
+
+Für die Performance-Analyse wurde ein Lighthouse-Audit in Google Chrome durchgeführt.
+
+### Baseline-Messung
+
+| Messwert                       | Ergebnis |
+| ------------------------------ | -------- |
+| Performance Score              | 81       |
+| Largest Contentful Paint (LCP) | 2,5 s    |
+| Cumulative Layout Shift (CLS)  | 0,065    |
+
+### Analyse
+
+Der Performance-Score liegt bereits im guten Bereich. Der CLS-Wert ist niedrig, wodurch kaum sichtbare Layout-Sprünge während des Ladens auftreten.
+
+Der größte Optimierungshebel liegt beim Largest Contentful Paint (LCP), da große Bilder oder andere sichtbare Inhalte im oberen Bereich der Seite die Ladezeit beeinflussen können.
+
+### Optimierungsmaßnahmen
+
+* Verwendung von Vite Production Builds
+* Gehashte Assets für langfristiges Browser-Caching
+* Cache-Control Header für statische Assets
+* SPA-Fallback über Express
+* Vorbereitung für moderne Bildformate wie WebP
+* Verwendung von festen Größenangaben (`width` und `height`) zur Vermeidung von Layout Shifts
+
+### Ergebnis
+
+Die Anwendung erreicht bereits vor weiteren Optimierungen einen Lighthouse Performance Score von 81 Punkten. Weitere Verbesserungen können durch optimierte Bilder (WebP/AVIF), Lazy Loading und kleinere JavaScript-Bundles erzielt werden.
+
+### Analyse der JavaScript-Bundles
+
+Nach dem Produktions-Build ergaben sich folgende Größen:
+
+| Datei | Größe |
+|---------|---------|
+| CSS Bundle | 27.83 kB |
+| JavaScript Bundle | 294.62 kB |
+| JavaScript (gzip) | 95.41 kB |
+
+Die erzeugten Bundles liegen bereits in einem komprimierten und optimierten Format vor. Das JavaScript-Bundle wird durch Vite automatisch minifiziert und zusätzlich durch Gzip-Kompression deutlich reduziert.
+
+Obwohl Lighthouse weiteres Einsparpotenzial bei JavaScript meldete, zeigte die Analyse der erzeugten Produktionsdateien, dass die Anwendung bereits relativ kompakte Bundles verwendet. Für zukünftige Versionen könnten zusätzliche Optimierungen durch Code-Splitting und Lazy Loading einzelner Komponenten umgesetzt werden.
+
+## Landing Page
+
+Für den finalen Polish wurde eine ungeschützte Landing Page ergänzt. Sie ist vor dem Login erreichbar und erklärt zuerst den Nutzen der Anwendung statt nur einzelne Features aufzulisten.
+
+### Above the fold
+
+Die Landing Page beginnt mit einer klaren Nutzen-Headline, einem kurzen erklärenden Subtext und einem direkten Call-to-Action zur Registrierung.
+
+### Nutzen statt Features
+
+Die Seite beschreibt, wie Mood Tracker beim Reflektieren von Stimmungen, beim Schreiben von Journal-Einträgen und beim Finden passender Coping Skills unterstützt.
+
+### Reibung minimieren
+
+Der primäre CTA führt direkt zur Registrierung. Zusätzlich gibt es einen Login-Link für bestehende Nutzerinnen und Nutzer.
+
+## Landing Page
+
+A dedicated landing page was added as the public entry point of the application.
+
+### Above the Fold
+The landing page presents a clear value proposition, a short description and a primary call-to-action.
+
+### Features & Benefits
+Instead of generic stock photos, the page uses mood icons and interactive UI previews inspired by the actual application.
+
+### Reduced Friction
+Users can directly navigate to registration or login pages through clearly visible call-to-action buttons.

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 
+import LandingPage from './pages/LandingPage'
 import Dashboard from './pages/Dashboard'
 import JournalPage from './pages/JournalPage'
 import SkillsPage from './pages/SkillsPage'
@@ -52,12 +53,25 @@ export default function App() {
         <main className="main-content">
           <Routes>
             <Route
+              path="/"
+              element={
+                loading ? (
+                  <div className="loading">Loading...</div>
+                ) : user ? (
+                  <Navigate to="/dashboard" replace />
+                ) : (
+                  <LandingPage />
+                )
+              }
+            />
+
+            <Route
               path="/login"
               element={
                 loading ? (
                   <div className="loading">Loading...</div>
                 ) : user ? (
-                  <Navigate to="/" replace />
+                  <Navigate to="/dashboard" replace />
                 ) : (
                   <LoginPage onLogin={setUser} />
                 )
@@ -70,7 +84,7 @@ export default function App() {
                 loading ? (
                   <div className="loading">Loading...</div>
                 ) : user ? (
-                  <Navigate to="/" replace />
+                  <Navigate to="/dashboard" replace />
                 ) : (
                   <RegisterPage onLogin={setUser} />
                 )
@@ -78,7 +92,7 @@ export default function App() {
             />
 
             <Route
-              path="/"
+              path="/dashboard"
               element={
                 <ProtectedRoute user={user} loading={loading}>
                   <Dashboard user={user} />

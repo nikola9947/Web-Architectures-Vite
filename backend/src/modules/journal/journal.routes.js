@@ -4,8 +4,10 @@ import { authenticateToken } from '../../middleware/auth.js'
 
 const router = express.Router()
 
+router.use(authenticateToken)
+
 const getUserId = (req) => {
-  return req.user?.id
+  return req.user.id
 }
 
 const handleError = (res, error) => {
