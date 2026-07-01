@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom'
 import './LandingPage.css'
 
+import happyIcon from '../assets/happy.svg'
+import calmIcon from '../assets/calm.svg'
+import anxiousIcon from '../assets/anxious.svg'
+import stressedIcon from '../assets/stressed.svg'
+import confusedIcon from '../assets/confused.svg'
+
 const previewMoods = [
-  { id: 'happy', label: 'Happy' },
-  { id: 'calm', label: 'Calm' },
-  { id: 'anxious', label: 'Anxious' },
-  { id: 'stressed', label: 'Stressed' }
+  { icon: happyIcon, label: 'Happy' },
+  { icon: calmIcon, label: 'Calm' },
+  { icon: anxiousIcon, label: 'Anxious' },
+  { icon: stressedIcon, label: 'Stressed' }
 ]
 
 export default function LandingPage() {
@@ -21,6 +27,7 @@ export default function LandingPage() {
             <Link to="/login" className="landing-login-link">
               Login
             </Link>
+
             <Link to="/register" className="landing-nav-button">
               Start for free
             </Link>
@@ -42,6 +49,7 @@ export default function LandingPage() {
               <Link to="/register" className="landing-primary-button">
                 Start tracking
               </Link>
+
               <Link to="/login" className="landing-secondary-button">
                 I already have an account
               </Link>
@@ -59,10 +67,13 @@ export default function LandingPage() {
 
               <div className="preview-mood-grid">
                 {previewMoods.map((mood) => (
-                  <div className="preview-mood" key={mood.id}>
-                    <svg className="preview-mood-icon" aria-hidden="true">
-                      <use href={`/moods.svg#${mood.id}`} />
-                    </svg>
+                  <div className="preview-mood" key={mood.label}>
+                    <img
+                      src={mood.icon}
+                      alt=""
+                      className="preview-mood-icon"
+                      aria-hidden="true"
+                    />
                     <span>{mood.label}</span>
                   </div>
                 ))}
@@ -79,9 +90,7 @@ export default function LandingPage() {
 
       <section className="landing-benefits">
         <article>
-          <svg className="benefit-icon" aria-hidden="true">
-            <use href="/moods.svg#calm" />
-          </svg>
+          <img src={calmIcon} alt="" className="benefit-icon" aria-hidden="true" />
           <h3>Recognize patterns</h3>
           <p>
             Track your emotional state over time and notice recurring moods,
@@ -90,9 +99,12 @@ export default function LandingPage() {
         </article>
 
         <article>
-          <svg className="benefit-icon" aria-hidden="true">
-            <use href="/moods.svg#confused" />
-          </svg>
+          <img
+            src={confusedIcon}
+            alt=""
+            className="benefit-icon"
+            aria-hidden="true"
+          />
           <h3>Reflect clearly</h3>
           <p>
             Use journal entries to sort your thoughts and understand what
@@ -101,9 +113,7 @@ export default function LandingPage() {
         </article>
 
         <article>
-          <svg className="benefit-icon" aria-hidden="true">
-            <use href="/moods.svg#happy" />
-          </svg>
+          <img src={happyIcon} alt="" className="benefit-icon" aria-hidden="true" />
           <h3>Find helpful skills</h3>
           <p>
             Get coping skills that fit your mood instead of scrolling through

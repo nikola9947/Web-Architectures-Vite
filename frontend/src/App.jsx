@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-
+import StatisticsPage from './pages/StatisticsPage'
 import LandingPage from './pages/LandingPage'
 import Dashboard from './pages/Dashboard'
 import JournalPage from './pages/JournalPage'
@@ -125,6 +125,20 @@ export default function App() {
                   <CalendarPage user={user} />
                 </ProtectedRoute>
               }
+            />
+            
+            <Route
+              path="/landing"
+              element={<LandingPage />}
+            />
+            
+            <Route
+            path="/statistics"
+            element={
+              <ProtectedRoute user={user} loading={loading}>
+                <StatisticsPage user={user} />
+              </ProtectedRoute>
+            }
             />
 
             <Route path="*" element={<Navigate to="/" replace />} />

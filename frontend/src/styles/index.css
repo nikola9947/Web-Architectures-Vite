@@ -8,7 +8,9 @@
 
   /* BACKGROUNDS */
 
-  --bg-main: #ffffff;
+  --bg-main:
+  radial-gradient(circle at top left, rgba(196, 241, 190, 0.35), transparent 34rem),
+  linear-gradient(135deg, #f8fbf8 0%, #eef4ef 55%, #dfe8e2 100%);
   --bg-card: #ffffff;
 
   /* TEXT */

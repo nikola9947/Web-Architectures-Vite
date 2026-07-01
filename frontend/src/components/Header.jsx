@@ -11,7 +11,8 @@ export default function Header({ user, setUser }) {
 
       setUser(null)
 
-      navigate('/login')
+      // Nach dem Logout zurück zur Landing Page
+      navigate('/landing')
     } catch (error) {
       console.error('Logout failed:', error)
     }
@@ -21,14 +22,14 @@ export default function Header({ user, setUser }) {
     <header className="header">
       <div className="header-content">
 
-        {/* LOGO */}
-        <NavLink to="/" className="header-logo">
+        {/* Logo */}
+        <NavLink to="/landing" className="header-logo">
           MoodTracker
         </NavLink>
 
-        {/* NAVIGATION */}
+        {/* Navigation */}
         <nav className="header-nav">
-          <NavLink to="/">
+          <NavLink to="/dashboard">
             Dashboard
           </NavLink>
 
@@ -43,11 +44,14 @@ export default function Header({ user, setUser }) {
           <NavLink to="/calendar">
             Calendar
           </NavLink>
+
+          <NavLink to="/statistics">
+            Statistics
+          </NavLink>
         </nav>
 
-        {/* USER */}
+        {/* User */}
         <div className="header-user">
-
           {user && (
             <span className="user-name">
               {user.username || user.email}
