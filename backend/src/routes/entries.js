@@ -1,9 +1,9 @@
 import express from 'express'
 import { dbRun, dbGet, dbAll } from '../utils/database.js'
 import { sendEventToClients } from '../utils/events.js'
-
+import { authenticateToken } from "../middleware/auth.js";
 const router = express.Router()
-
+router.use(authenticateToken);
 function resolveMoodValue(body) {
   const rawMood =
     body?.customMood?.trim() ||

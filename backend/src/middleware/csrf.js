@@ -23,23 +23,12 @@ export function verifyCsrf(req, res, next) {
   }
 
   // Auth-Routen überspringen
-  if (
-    req.originalUrl.startsWith("/api/auth/")
-  ) {
+  if (req.path.startsWith("/api/auth/")) {
     return next();
   }
 
   const cookieToken = req.cookies?.csrfToken;
   const headerToken = req.get("X-CSRF-Token");
-
-  // ===== DEBUG =====
-  console.log("========== CSRF ==========");
-  console.log("URL:       ", req.originalUrl);
-  console.log("Method:    ", req.method);
-  console.log("Cookie:    ", cookieToken);
-  console.log("Header:    ", headerToken);
-  console.log("==========================");
-  // ==================
 
   if (!cookieToken) {
     return res.status(403).json({
@@ -53,7 +42,25 @@ export function verifyCsrf(req, res, next) {
     });
   }
 
-  if (cookieToken !== headerToken) {
+  try {
+    const cookieHash = crypto
+      .createHash("sha256")
+      .update(cookieToken)
+      .digest();
+
+    const headerHash = crypto
+      .createHash("sha256")
+      .update(headerToken)
+      .digest();
+
+    if (!crypto.timingSafeEqual(cookieHash, headerHash)) {
+      return res.status(403).json({
+        error: "Invalid CSRF token."
+      });
+    }
+  } catch (err) {
+    console.error("CSRF verification failed:", err);
+
     return res.status(403).json({
       error: "Invalid CSRF token."
     });

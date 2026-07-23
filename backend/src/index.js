@@ -95,19 +95,21 @@ app.use(
 if (process.env.NODE_ENV === 'production') {
   app.use((req, res, next) => {
     if (req.secure) {
-      return next()
+      return next();
     }
+
+    const safePath = req.originalUrl.replace(/^\/+/g, "/");
 
     return res.redirect(
       301,
-      `https://${APP_HOST}${req.originalUrl}`
-    )
-  })
+      `https://${APP_HOST}${safePath}`
+    );
+  });
 }
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser())
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
