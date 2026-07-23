@@ -105,7 +105,7 @@ export default function MoodTracker({ onMoodSubmit }) {
           min="1"
           max="10"
           value={intensity}
-          onChange={(e) => setIntensity(e.target.value)}
+          onChange={(e) => setIntensity(Number(e.target.value))}
           className="intensity-slider"
         />
         <div className="intensity-labels">

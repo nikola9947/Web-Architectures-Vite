@@ -1,14 +1,34 @@
 .landing-page {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(196, 241, 190, 0.35), transparent 34rem),
-    linear-gradient(135deg, #f8fbf8 0%, #eef4ef 55%, #dfe8e2 100%);
+    radial-gradient(circle at top left,
+      rgba(196, 241, 190, 0.35),
+      transparent 34rem),
+    linear-gradient(
+      135deg,
+      #f8fbf8 0%,
+      #eef4ef 55%,
+      #dfe8e2 100%
+    );
   color: #06261b;
 }
 
-.landing-hero {
-  padding: 28px clamp(24px, 6vw, 92px) 70px;
+/* ---------- Hero ---------- */
+
+.hero {
+  min-height: calc(100vh - 90px);
+  display: flex;
+  align-items: center;
+  padding: 2rem 0 4rem;
 }
+
+.hero-title {
+  font-size: clamp(3.3rem, 6vw, 6rem);
+  line-height: .94;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------- Navigation ---------- */
 
 .landing-nav {
   width: 100%;
@@ -24,7 +44,7 @@
   color: #06261b;
   font-size: clamp(2rem, 4vw, 4rem);
   font-weight: 900;
-  letter-spacing: -0.06em;
+  letter-spacing: -.06em;
 }
 
 .landing-nav-actions {
@@ -46,22 +66,29 @@
   text-decoration: none;
   border-radius: 999px;
   font-weight: 900;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
 }
 
 .landing-nav-button {
   background: #06261b;
-  color: #ffffff;
+  color: #fff;
   padding: 14px 24px;
-  box-shadow: 0 14px 34px rgba(6, 38, 27, 0.18);
+  box-shadow: 0 14px 34px rgba(6,38,27,.18);
 }
+
+/* ---------- Hero Layout ---------- */
 
 .landing-hero-content {
   max-width: 1360px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
-  gap: clamp(36px, 6vw, 90px);
+  grid-template-columns:
+    minmax(0,1.05fr)
+    minmax(360px,.95fr);
+  gap: clamp(60px,7vw,110px);
   align-items: center;
 }
 
@@ -72,31 +99,34 @@
 .landing-eyebrow {
   margin: 0 0 18px;
   color: #718079;
-  font-size: 0.9rem;
+  font-size: .9rem;
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
+  letter-spacing: .18em;
 }
 
 .landing-copy h1 {
   margin: 0;
   color: #06261b;
-  font-size: clamp(3rem, 7vw, 6.9rem);
-  line-height: 0.92;
-  letter-spacing: -0.075em;
+  font-size: clamp(3.3rem,6vw,6rem);
+  line-height: .93;
+  letter-spacing: -.07em;
   max-width: 760px;
 }
 
 .landing-subtitle {
   margin: 28px 0 0;
   color: #52645c;
-  font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+  font-size: clamp(1.1rem,1.8vw,1.45rem);
   line-height: 1.65;
   max-width: 650px;
 }
 
+/* ---------- Buttons ---------- */
+
 .landing-actions {
-  margin-top: 38px;
+  margin-top: 42px;
+  margin-bottom: 70px;
   display: flex;
   flex-wrap: wrap;
   gap: 18px;
@@ -104,16 +134,16 @@
 
 .landing-primary-button {
   background: #06261b;
-  color: #ffffff;
+  color: #fff;
   padding: 18px 30px;
-  box-shadow: 0 18px 42px rgba(6, 38, 27, 0.2);
+  box-shadow: 0 18px 42px rgba(6,38,27,.20);
 }
 
 .landing-secondary-button {
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255,255,255,.78);
   color: #06261b;
   padding: 18px 30px;
-  border: 1px solid rgba(6, 38, 27, 0.12);
+  border: 1px solid rgba(6,38,27,.12);
 }
 
 .landing-nav-button:hover,
@@ -122,46 +152,64 @@
   transform: translateY(-2px);
 }
 
+/* ---------- Preview ---------- */
+
 .landing-preview {
   display: flex;
   justify-content: center;
 }
 
 .preview-card {
-  width: min(100%, 520px);
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(6, 38, 27, 0.12);
+  width: min(100%,520px);
+
+  background: rgba(255,255,255,.78);
+
+  border: 1px solid rgba(6,38,27,.12);
   border-radius: 42px;
-  padding: clamp(26px, 4vw, 42px);
-  box-shadow: 0 28px 70px rgba(6, 38, 27, 0.13);
+
+  padding: clamp(26px,4vw,42px);
+
   backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 28px 70px rgba(6,38,27,.13);
 }
 
 .preview-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   color: #718079;
+
+  font-size: .78rem;
   font-weight: 900;
+
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.78rem;
+  letter-spacing: .14em;
 }
 
 .preview-card-header strong {
   background: #06261b;
-  color: #ffffff;
+  color: #fff;
+
   padding: 8px 14px;
+
   border-radius: 999px;
+
   letter-spacing: 0;
 }
 
 .preview-card h2 {
   margin: 26px 0 24px;
+
   color: #06261b;
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  letter-spacing: -0.05em;
+
+  font-size: clamp(1.8rem,3vw,2.6rem);
+
+  letter-spacing: -.05em;
 }
+/* ---------- Preview Mood Grid ---------- */
 
 .preview-mood-grid {
   display: grid;
@@ -171,111 +219,191 @@
 
 .preview-mood {
   min-height: 126px;
-  border-radius: 28px;
-  border: 2px solid rgba(6, 38, 27, 0.12);
+
   background: #ffffff;
+
+  border: 2px solid rgba(6, 38, 27, 0.12);
+  border-radius: 28px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   gap: 12px;
-  font-weight: 900;
+
   color: #06261b;
+  font-weight: 900;
+
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.preview-mood:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(6,38,27,.08);
 }
 
 .preview-mood-icon {
   width: 48px;
   height: 48px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
+  object-fit: contain;
+
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(8%)
+    sepia(44%)
+    saturate(1800%)
+    hue-rotate(128deg)
+    brightness(72%)
+    contrast(130%);
 }
 
+/* ---------- Suggestion ---------- */
+
 .preview-suggestion {
-  margin-top: 22px;
+  margin-top: 24px;
+
   background: #dfeade;
+
   border-radius: 28px;
+
   padding: 22px;
-  color: #06261b;
 }
 
 .preview-suggestion span {
   display: block;
+
   margin-bottom: 8px;
+
   color: #718079;
-  font-size: 0.78rem;
+
+  font-size: .78rem;
   font-weight: 900;
+
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: .14em;
 }
 
 .preview-suggestion p {
   margin: 0;
+
+  color: #06261b;
+
   font-size: 1rem;
   line-height: 1.55;
   font-weight: 700;
 }
 
+/* ---------- Benefits ---------- */
+
 .landing-benefits {
   max-width: 1360px;
+
   margin: 0 auto;
-  padding: 0 clamp(24px, 6vw, 92px) 80px;
+
+  padding: 2rem clamp(24px,6vw,92px) 80px;
+
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 22px;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+
+  gap: 26px;
 }
 
 .landing-benefits article {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(6, 38, 27, 0.1);
+  background: rgba(255,255,255,.75);
+
+  border: 1px solid rgba(6,38,27,.10);
   border-radius: 34px;
-  padding: 32px;
-  box-shadow: 0 18px 48px rgba(6, 38, 27, 0.08);
+
+  padding: 34px;
+
+  box-shadow: 0 18px 48px rgba(6,38,27,.08);
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.landing-benefits article:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 22px 54px rgba(6,38,27,.12);
 }
 
 .benefit-icon {
-  width: 42px;
-  height: 42px;
-  margin-bottom: 18px;
-  color: #06261b;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
+  width: 44px;
+  height: 44px;
+
+  object-fit: contain;
+
+  margin-bottom: 20px;
+
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(8%)
+    sepia(44%)
+    saturate(1800%)
+    hue-rotate(128deg)
+    brightness(72%)
+    contrast(130%);
 }
 
 .landing-benefits h3 {
   margin: 0 0 12px;
+
   color: #06261b;
+
   font-size: 1.45rem;
-  letter-spacing: -0.04em;
+
+  letter-spacing: -.04em;
 }
 
 .landing-benefits p {
   margin: 0;
+
   color: #52645c;
+
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
+/* ---------- Responsive ---------- */
+
 @media (max-width: 920px) {
+
+  .landing-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
   .landing-hero-content {
     grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .landing-copy {
+    max-width: 100%;
+  }
+
+  .landing-actions {
+    margin-bottom: 48px;
   }
 
   .landing-benefits {
     grid-template-columns: 1fr;
+    gap: 22px;
   }
 
-  .landing-nav {
-    align-items: flex-start;
-    gap: 18px;
-    flex-direction: column;
-  }
 }
 
 @media (max-width: 560px) {
-  .landing-hero {
-    padding-inline: 18px;
+
+  .hero {
+    padding: 2rem 0 3rem;
   }
 
   .landing-actions,
@@ -292,43 +420,77 @@
     text-align: center;
   }
 
+
   .preview-mood-grid {
     grid-template-columns: 1fr;
   }
 
   .preview-mood {
-  min-height: 126px;
-  border-radius: 28px;
-  border: 2px solid rgba(6, 38, 27, 0.12);
-  background: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  font-weight: 900;
-  color: #06261b;
+    min-height: 118px;
+    gap: 14px;
+  }
+
+  .preview-mood-icon {
+    width: 54px;
+    height: 54px;
+  }
+
+  .benefit-icon {
+    width: 42px;
+    height: 42px;
+  }
+
 }
 
-.preview-mood-icon {
-  width: 54px;
-  height: 54px;
-  color: #06261b;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2.4;
+.phone-mockup {
+  position: relative;
+
+  width: 410px;
+  padding: 12px;
+
+  background: linear-gradient(
+    145deg,
+    #222,
+    #111
+  );
+
+  border-radius: 52px;
+
+  box-shadow:
+    0 40px 80px rgba(6,38,27,.18),
+    0 12px 24px rgba(0,0,0,.18);
+
+  overflow: hidden;
 }
 
-.preview-mood-icon {
-  width: 54px;
-  height: 54px;
-  object-fit: contain;
+.phone-notch {
+  position: absolute;
+
+  top: 10px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 118px;
+  height: 30px;
+
+  background: #000;
+
+  border-radius: 20px;
+
+  z-index: 100;
 }
 
-.benefit-icon {
-  width: 42px;
-  height: 42px;
-  object-fit: contain;
-  margin-bottom: 18px;
-}
+.preview-card {
+  width: 100%;
+
+  margin-top: 16px;
+
+  background: rgba(255,255,255,.95);
+
+  border-radius: 38px;
+
+  padding: 42px 28px 28px;
+
+  overflow: hidden;
 }

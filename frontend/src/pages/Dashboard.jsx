@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getMoods, createMood, getSkillsForMood, addUserSkill } from '../services/api'
+import { getMoods, createMood, getSkillsForMood, getUserSkills, addUserSkill } from '../services/api'
 import MoodTracker from '../components/MoodTracker'
 import './Dashboard.css'
 
@@ -15,6 +15,7 @@ import confusedIcon from '../assets/confused.svg'
 import lonelyIcon from '../assets/lonely.svg'
 import sluggishIcon from '../assets/sluggish.svg'
 import leaveIcon from '../assets/leave.svg'
+
 
 const MOOD_ICONS = {
   happy: happyIcon,
@@ -35,7 +36,7 @@ export default function Dashboard({ user }) {
   const [lastMood, setLastMood] = useState(null)
   const [loading, setLoading] = useState(true)
   const [addingSkillId, setAddingSkillId] = useState(null)
-
+  const [successMessage, setSuccessMessage] = useState('')
   useEffect(() => {
     loadDashboard()
   }, [])
@@ -51,8 +52,18 @@ export default function Dashboard({ user }) {
         const newestMood = moodList[0]
         setLastMood(newestMood)
 
-        const skillResponse = await getSkillsForMood(newestMood.mood)
-        setRecommendations(skillResponse.data || [])
+        const [skillResponse, userSkillsResponse] = await Promise.all([
+          getSkillsForMood(newestMood.mood),
+          getUserSkills()
+        ])
+
+        const userSkillIds = (userSkillsResponse.data || []).map(skill => skill.id)
+
+        const filteredRecommendations = (skillResponse.data || []).filter(
+          skill => !userSkillIds.includes(skill.id)
+        )
+
+        setRecommendations(filteredRecommendations)
       }
     } catch (error) {
       console.error('Failed to load dashboard:', error)
@@ -77,7 +88,17 @@ export default function Dashboard({ user }) {
   const handleAddSkill = async (skillId) => {
     try {
       setAddingSkillId(skillId)
+
       await addUserSkill(skillId)
+
+      await loadDashboard()
+
+      setSuccessMessage('Skill added successfully!')
+
+      setTimeout(() => {
+        setSuccessMessage('')
+      }, 3000)
+
     } catch (error) {
       console.error('Failed to add skill:', error)
     } finally {
@@ -213,6 +234,12 @@ export default function Dashboard({ user }) {
             View all skills
           </Link>
         </div>
+        
+        {successMessage && (
+          <div className="success-message">
+            {successMessage}
+          </div>
+        )}
 
         {recommendations.length > 0 ? (
           <div className="recommendation-list">
