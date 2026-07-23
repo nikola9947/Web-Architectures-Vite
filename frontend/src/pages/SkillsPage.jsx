@@ -50,21 +50,29 @@ export default function SkillsPage() {
     loadSkills()
   }, [])
 
-  const loadSkills = async () => {
-    try {
-      const [allSkillsRes, userSkillsRes] = await Promise.all([
-        getAllSkills(),
-        getUserSkills()
-      ])
+const loadSkills = async () => {
+  try {
+    const [allSkillsRes, userSkillsRes] = await Promise.all([
+      getAllSkills(),
+      getUserSkills()
+    ])
 
-      setAllSkills(allSkillsRes.data || [])
-      setUserSkills(userSkillsRes.data || [])
-    } catch (error) {
-      console.error('Failed to load skills:', error)
-    } finally {
-      setLoading(false)
-    }
+    setAllSkills(allSkillsRes.data || [])
+    setUserSkills(userSkillsRes.data || [])
+
+    console.log("ALL:", allSkillsRes.data)
+    console.log("USER:", userSkillsRes.data)
+    console.log(
+      "Available IDs:",
+      (allSkillsRes.data || []).map(s => s.id),
+      (userSkillsRes.data || []).map(s => s.id)
+    )
+  } catch (error) {
+    console.error(error)
+  } finally {
+    setLoading(false)
   }
+}
 
   const handleAddSkill = async (skillId) => {
     try {
@@ -93,10 +101,21 @@ export default function SkillsPage() {
     }
   }
 
-  const getAvailableSkills = () => {
-    const userSkillIds = userSkills.map((s) => s.id)
-    return allSkills.filter((s) => !userSkillIds.includes(s.id))
-  }
+const getAvailableSkills = () => {
+  const userSkillIds = userSkills.map((s) => Number(s.id))
+
+  console.log("ALL", allSkills)
+  console.log("USER", userSkills)
+  console.log("USER IDS", userSkillIds)
+
+  const available = allSkills.filter(
+    (s) => !userSkillIds.includes(Number(s.id))
+  )
+
+  console.log("AVAILABLE", available)
+
+  return available
+}
 
   const matchesFilter = (skill) =>
     skill.name.toLowerCase().includes(filter.toLowerCase()) ||

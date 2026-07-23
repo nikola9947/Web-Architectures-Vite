@@ -85,26 +85,31 @@ export default function Dashboard({ user }) {
     }
   }
 
-  const handleAddSkill = async (skillId) => {
-    try {
-      setAddingSkillId(skillId)
+const handleAddSkill = async (skillId) => {
+  try {
+    setAddingSkillId(skillId)
 
-      await addUserSkill(skillId)
+    await addUserSkill(skillId)
 
-      await loadDashboard()
+    // Sofort aus den Empfehlungen entfernen
+    setRecommendations((prev) =>
+      prev.filter((skill) => skill.id !== skillId)
+    )
 
-      setSuccessMessage('Skill added successfully!')
+    setSuccessMessage("Skill added successfully!")
 
-      setTimeout(() => {
-        setSuccessMessage('')
-      }, 3000)
+    setTimeout(() => {
+      setSuccessMessage("")
+    }, 3000)
 
-    } catch (error) {
-      console.error('Failed to add skill:', error)
-    } finally {
-      setAddingSkillId(null)
-    }
+    // Danach Daten synchronisieren
+    await loadDashboard()
+  } catch (error) {
+    console.error("Failed to add skill:", error)
+  } finally {
+    setAddingSkillId(null)
   }
+}
 
   const getMoodToneClass = (mood) => {
     const map = {

@@ -7,14 +7,24 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
-
+import { verifyCsrf } from "./middleware/csrf.js";
 import authRoutes from './routes/auth.js'
 import moodRoutes from './routes/moods.js'
 import skillRoutes from './routes/skills.js'
 import eventRoutes from './routes/events.js'
 import journalRoutes from './modules/journal/journal.routes.js'
+import jwt from 'jsonwebtoken'
+
 
 dotenv.config()
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error(
+    "FATAL: JWT_SECRET environment variable must be set and contain at least 32 characters."
+  );
+}
 
 const APP_HOST = process.env.APP_HOST
 
@@ -96,6 +106,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 const apiLimiter = rateLimit({
@@ -115,26 +126,77 @@ app.get('/api/health', (req, res) => {
   })
 })
 
-app.use('/api/auth', authRoutes)
-app.use('/api/moods', moodRoutes)
-app.use('/api/entries', journalRoutes)
-app.use('/api/skills', skillRoutes)
-app.use('/api/events', eventRoutes)
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+*/
 
-const io = new Server(httpServer)
+app.use('/api/auth', authRoutes)
+
+app.use('/api/moods', verifyCsrf, moodRoutes)
+app.use('/api/entries', verifyCsrf, journalRoutes)
+app.use('/api/skills', verifyCsrf, skillRoutes)
+app.use('/api/events', verifyCsrf, eventRoutes)
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production'
+      ? `https://${APP_HOST}`
+      : 'http://localhost:5173',
+    credentials: true
+  }
+})
+
+io.use((socket, next) => {
+  try {
+    const cookieHeader = socket.handshake.headers.cookie || ''
+
+    const cookies = Object.fromEntries(
+      cookieHeader
+        .split(';')
+        .filter(Boolean)
+        .map(c => {
+          const [key, ...value] = c.trim().split('=')
+          return [key, decodeURIComponent(value.join('='))]
+        })
+    )
+    const token = cookies.token
+
+    if (!token) {
+      return next(new Error('Authentication required'))
+    }
+
+    const payload = jwt.verify(token, JWT_SECRET)
+
+    socket.user = {
+      id: payload.userId,
+      email: payload.email
+    }
+
+    socket.join(`user:${payload.userId}`)
+
+    next()
+  } catch (err) {
+    return next(new Error('Invalid authentication token'))
+  }
+})
 
 io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id)
+  console.log(
+    `Socket connected: ${socket.id} (User ${socket.user.id})`
+  )
 
   socket.on('journal-entry-created', (data) => {
-    socket.broadcast.emit('journal-entry-created', data)
+    io.to(`user:${socket.user.id}`)
+      .emit('journal-entry-created', data)
   })
 
   socket.on('disconnect', () => {
-    console.log('Socket disconnected:', socket.id)
+    console.log(
+      `Socket disconnected: ${socket.id}`
+    )
   })
 })
-
 app.use(
   express.static(buildPath, {
     setHeaders: (res, filePath) => {

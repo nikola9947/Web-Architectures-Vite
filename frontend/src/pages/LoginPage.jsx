@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { loginUser, getCurrentUser } from '../services/api'
+import { socket } from '../services/socket'
 import './AuthPage.css'
 
 export default function LoginPage({ onLogin }) {
@@ -18,8 +19,14 @@ export default function LoginPage({ onLogin }) {
     try {
       await loginUser(email, password)
 
-      // Verify the session was created by fetching current user
+      // Session prüfen
       const userRes = await getCurrentUser()
+
+      // Socket erst verbinden, nachdem der Login erfolgreich war
+      if (!socket.connected) {
+        socket.connect()
+      }
+
       onLogin(userRes.data.user)
 
       navigate('/')

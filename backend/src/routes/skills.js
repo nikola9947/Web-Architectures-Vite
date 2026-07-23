@@ -7,7 +7,14 @@ const router = express.Router();
 // Get all available skills
 router.get('/', async (req, res) => {
   try {
-    const skills = await dbAll('SELECT * FROM skills ORDER BY category, name');
+    const skills = await dbAll(
+      'SELECT * FROM skills ORDER BY category, name'
+    );
+
+    console.log('==============================');
+    console.log('ALL SKILLS');
+    console.table(skills);
+
     res.json(skills);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -18,10 +25,12 @@ router.get('/', async (req, res) => {
 router.get('/for-mood/:mood', async (req, res) => {
   try {
     const mood = req.params.mood.toLowerCase();
+
     const skills = await dbAll(
       "SELECT * FROM skills WHERE for_moods LIKE ? ORDER BY category, name",
       [`%${mood}%`]
     );
+
     res.json(skills);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -31,7 +40,8 @@ router.get('/for-mood/:mood', async (req, res) => {
 // Get user's tracked skills
 router.get('/my-skills', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id
+    const userId = req.user.id;
+
     const userSkills = await dbAll(`
       SELECT s.*, us.practiced_count, us.last_practiced
       FROM skills s
@@ -39,6 +49,12 @@ router.get('/my-skills', authenticateToken, async (req, res) => {
       WHERE us.user_id = ?
       ORDER BY s.category, s.name
     `, [userId]);
+
+    console.log('==============================');
+    console.log('USER:', userId);
+    console.log('USER SKILLS');
+    console.table(userSkills);
+
     res.json(userSkills);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -48,56 +64,90 @@ router.get('/my-skills', authenticateToken, async (req, res) => {
 // Add skill to user's list
 router.post('/my-skills/:skillId', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id
-    const skillId = req.params.skillId
+    const userId = req.user.id;
+    const skillId = req.params.skillId;
 
-    const skill = await dbGet('SELECT * FROM skills WHERE id = ?', [skillId])
+    console.log('==============================');
+    console.log('ADD REQUEST');
+    console.log('User:', userId);
+    console.log('Skill:', skillId);
+
+    const skill = await dbGet(
+      'SELECT * FROM skills WHERE id = ?',
+      [skillId]
+    );
+
     if (!skill) {
-      return res.status(404).json({ error: 'Skill not found' })
+      console.log('❌ Skill existiert nicht');
+      return res.status(404).json({ error: 'Skill not found' });
     }
 
     const existing = await dbGet(
       'SELECT * FROM user_skills WHERE user_id = ? AND skill_id = ?',
       [userId, skillId]
-    )
+    );
+
+    console.log('Existing entry:', existing);
 
     if (existing) {
-      return res.status(400).json({ error: 'Skill already added' })
+      console.log('❌ Skill bereits vorhanden');
+      return res.status(400).json({
+        error: 'Skill already added'
+      });
     }
 
     await dbRun(
       'INSERT INTO user_skills (user_id, skill_id) VALUES (?, ?)',
       [userId, skillId]
-    )
+    );
 
-    res.status(201).json({ message: 'Skill added' })
+    console.log('✅ Skill erfolgreich hinzugefügt');
+
+    const afterInsert = await dbAll(
+      'SELECT * FROM user_skills WHERE user_id = ?',
+      [userId]
+    );
+
+    console.log('Aktuelle user_skills:');
+    console.table(afterInsert);
+
+    res.status(201).json({
+      message: 'Skill added'
+    });
+
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 });
 
 // Remove skill from user's list
 router.delete('/my-skills/:skillId', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id
-    const skillId = req.params.skillId
+    const userId = req.user.id;
+    const skillId = req.params.skillId;
 
     await dbRun(
       'DELETE FROM user_skills WHERE user_id = ? AND skill_id = ?',
       [userId, skillId]
-    )
+    );
 
-    res.json({ message: 'Skill removed' })
+    console.log('Skill entfernt:', skillId);
+
+    res.json({
+      message: 'Skill removed'
+    });
+
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
 });
 
 // Mark skill as practiced
 router.post('/my-skills/:skillId/practice', authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id
-    const skillId = req.params.skillId
+    const userId = req.user.id;
+    const skillId = req.params.skillId;
 
     await dbRun(
       `UPDATE user_skills
@@ -105,11 +155,16 @@ router.post('/my-skills/:skillId/practice', authenticateToken, async (req, res) 
            last_practiced = CURRENT_TIMESTAMP
        WHERE user_id = ? AND skill_id = ?`,
       [userId, skillId]
-    )
+    );
 
-    res.json({ message: 'Skill practiced' })
+    console.log('Skill geübt:', skillId);
+
+    res.json({
+      message: 'Skill practiced'
+    });
+
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
 });
 

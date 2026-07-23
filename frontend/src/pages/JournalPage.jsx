@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { getEntries, createEntry, updateEntry, deleteEntry, getMoods } from '../services/api'
-import { socket } from '../services/socket'
 import './JournalPage.css'
 
 import journalIcon from '../assets/journal.svg'
@@ -68,19 +67,6 @@ export default function JournalPage() {
   })
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  useEffect(() => {
-    socket.on('journal-entry-created', () => {
-      loadData()
-    })
-
-    return () => {
-      socket.off('journal-entry-created')
-    }
-  }, [])
 
   const loadData = async () => {
     try {
@@ -153,10 +139,6 @@ export default function JournalPage() {
           selectedMoodValue
         )
 
-        socket.emit('journal-entry-created', {
-          entryId: response.data.id,
-          title: response.data.title
-        })
       }
 
       resetForm()
