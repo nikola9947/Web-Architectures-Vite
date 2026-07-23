@@ -2,18 +2,23 @@ import express from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { prisma } from '../lib/prisma.js'
+import {
+  generateCsrfToken,
+  verifyCsrfToken
+} from '../middleware/csrf.js'
 
 const router = express.Router()
 
 const createToken = (user) => {
-  return jwt.sign(
-    {
-      userId: user.id,
-      email: user.email
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: '24h' }
-  )
+  const payload = {
+    userId: user.id,
+    email: user.email
+  }
+
+  return jwt.sign(payload, process.env.JWT_SECRET, {
+    algorithm: "HS256",
+    expiresIn: "24h"
+  })
 }
 
 export const authenticateToken = (req, res, next) => {
@@ -48,7 +53,7 @@ export const authenticateToken = (req, res, next) => {
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  sameSite: 'strict',
   maxAge: 24 * 60 * 60 * 1000
 }
 
@@ -134,3 +139,4 @@ router.post('/login', async (req, res) => {
 })
 
 export default router
+router.get('/csrf', generateCsrfToken)

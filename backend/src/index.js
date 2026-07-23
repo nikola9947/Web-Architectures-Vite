@@ -16,6 +16,14 @@ import journalRoutes from './modules/journal/journal.routes.js'
 
 dotenv.config()
 
+const APP_HOST = process.env.APP_HOST
+
+if (process.env.NODE_ENV === 'production' && !APP_HOST) {
+  throw new Error(
+    'APP_HOST environment variable is required in production.'
+  )
+}
+
 const app = express()
 const httpServer = createServer(app)
 
@@ -35,14 +43,55 @@ app.disable('x-powered-by')
 
 app.use(
   helmet({
-    contentSecurityPolicy: false
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+
+        scriptSrc: [
+          "'self'"
+        ],
+
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'"
+        ],
+
+        imgSrc: [
+          "'self'",
+          'data:',
+          'https:'
+        ],
+
+        connectSrc: [
+          "'self'",
+          'ws:',
+          'wss:'
+        ],
+
+        objectSrc: ["'none'"],
+
+        frameAncestors: ["'none'"],
+
+        baseUri: ["'self'"],
+
+        formAction: ["'self'"]
+      }
+    },
+
+    crossOriginEmbedderPolicy: false
   })
 )
 
 if (process.env.NODE_ENV === 'production') {
   app.use((req, res, next) => {
-    if (req.secure) return next()
-    return res.redirect(301, `https://${req.headers.host}${req.originalUrl}`)
+    if (req.secure) {
+      return next()
+    }
+
+    return res.redirect(
+      301,
+      `https://${APP_HOST}${req.originalUrl}`
+    )
   })
 }
 
@@ -90,9 +139,15 @@ app.use(
   express.static(buildPath, {
     setHeaders: (res, filePath) => {
       if (filePath.endsWith('index.html')) {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+        res.setHeader(
+          'Cache-Control',
+          'no-cache, no-store, must-revalidate'
+        )
       } else if (filePath.includes(`${path.sep}assets${path.sep}`)) {
-        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable')
+        res.setHeader(
+          'Cache-Control',
+          'public, max-age=31536000, immutable'
+        )
       }
     }
   })

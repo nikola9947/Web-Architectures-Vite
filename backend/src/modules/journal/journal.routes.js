@@ -19,7 +19,7 @@ const handleError = (res, error) => {
     return res.status(404).json({ error: error.message })
   }
 
-  console.error(error)
+  console.error("Login failed");
   return res.status(500).json({ error: 'Internal error' })
 }
 

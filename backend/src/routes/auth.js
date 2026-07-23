@@ -1,10 +1,17 @@
 import express from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 import { prisma } from '../lib/prisma.js'
 import { sendRegisterSuccessEmail } from '../utils/sendEmail.js'
 
 const router = express.Router()
+
+const JWT_SECRET = process.env.JWT_SECRET
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is missing.')
+}
 
 const createToken = (user) => {
   return jwt.sign(
@@ -12,16 +19,24 @@ const createToken = (user) => {
       userId: user.id,
       email: user.email
     },
-    process.env.JWT_SECRET,
-    { expiresIn: '24h' }
+    JWT_SECRET,
+    {
+      algorithm: 'HS256',
+      expiresIn: '24h'
+    }
   )
 }
 
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
-  maxAge: 24 * 60 * 60 * 1000
+
+  // Schutz gegen CSRF
+  sameSite: 'strict',
+
+  maxAge: 24 * 60 * 60 * 1000,
+
+  path: '/'
 }
 
 router.post('/register', async (req, res) => {
@@ -66,15 +81,17 @@ router.post('/register', async (req, res) => {
     sendRegisterSuccessEmail({
       to: user.email,
       username: user.username
-    }).catch((error) => {
-      console.error('Register email failed:', error)
+    }).catch((err) => {
+      console.error('Mail error:', err.message)
     })
 
     return res.status(201).json({
       user
     })
-  } catch (error) {
-    console.error('Register error:', error)
+
+  } catch (err) {
+
+    console.error('Register failed:', err.message)
 
     return res.status(500).json({
       error: 'Registrierung fehlgeschlagen.'
@@ -83,7 +100,9 @@ router.post('/register', async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
+
   try {
+
     const { email, password } = req.body
 
     if (!email || !password) {
@@ -121,8 +140,10 @@ router.post('/login', async (req, res) => {
         email: user.email
       }
     })
-  } catch (error) {
-    console.error('Login error:', error)
+
+  } catch (err) {
+
+    console.error('Login failed:', err.message)
 
     return res.status(500).json({
       error: 'Login fehlgeschlagen.'
@@ -131,19 +152,24 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/logout', (req, res) => {
+
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    sameSite: 'strict',
+    path: '/'
   })
 
   return res.status(200).json({
     message: 'Logout erfolgreich.'
   })
+
 })
 
 router.get('/me', async (req, res) => {
+
   try {
+
     const token = req.cookies?.token
 
     if (!token) {
@@ -152,7 +178,13 @@ router.get('/me', async (req, res) => {
       })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(
+      token,
+      JWT_SECRET,
+      {
+        algorithms: ['HS256']
+      }
+    )
 
     const user = await prisma.user.findUnique({
       where: {
@@ -174,11 +206,15 @@ router.get('/me', async (req, res) => {
     return res.json({
       user
     })
-  } catch (error) {
+
+  } catch {
+
     return res.status(401).json({
-      error: 'Nicht eingeloggt.'
+      error: 'Nicht eingloggt.'
     })
+
   }
+
 })
 
 export default router

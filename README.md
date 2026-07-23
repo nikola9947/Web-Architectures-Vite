@@ -372,7 +372,7 @@ Cookie-Einstellungen:
 {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax'
+  sameSite: 'strict'
 }
 ```
 
@@ -689,7 +689,7 @@ Der Login setzt einen JWT als HttpOnly-Cookie:
 res.cookie('token', token, {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  sameSite: 'strict',
   path: '/',
   maxAge: 7 * 24 * 60 * 60 * 1000
 })
@@ -711,7 +711,7 @@ secure: process.env.NODE_ENV === 'production'
 
 ### Warum SameSite Lax?
 
-`sameSite: 'lax'` reicht aus, weil Frontend und API auf derselben Domain laufen. Es ist kein `SameSite=None` notwendig, da keine Cross-Site-Requests verwendet werden.
+`sameSite: 'strict'` reicht aus, weil Frontend und API auf derselben Domain laufen. Es ist kein `SameSite=None` notwendig, da keine Cross-Site-Requests verwendet werden.
 
 `SameSite=None` wäre nur nötig, wenn Frontend und Backend auf komplett unterschiedlichen Sites liegen würden. Für diese Architektur wäre es unnötig schwächer.
 
@@ -723,7 +723,7 @@ Beim Logout muss der Cookie mit denselben Attributen gelöscht werden:
 res.clearCookie('token', {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  sameSite: 'strict',
   path: '/'
 })
 ```
