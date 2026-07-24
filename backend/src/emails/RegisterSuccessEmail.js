@@ -1,11 +1,22 @@
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export default function RegisterSuccessEmail(username) {
+  const safeUsername = escapeHtml(username);
+
   return `
     <!DOCTYPE html>
     <html>
       <body style="margin:0;padding:0;background:#f8f8f6;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:18px;padding:32px;color:#163352;">
           <h1 style="margin-top:0;color:#163352;">
-            Willkommen beim Mood Tracker, ${username}!
+            Willkommen beim Mood Tracker, ${safeUsername}!
           </h1>
 
           <p>
@@ -25,5 +36,5 @@ export default function RegisterSuccessEmail(username) {
         </div>
       </body>
     </html>
-  `
+  `;
 }

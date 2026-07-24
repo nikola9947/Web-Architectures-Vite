@@ -1,20 +1,21 @@
-import express from 'express'
-import { addClient } from '../utils/events.js'
+import express from "express";
+import { authenticateToken } from "../middleware/auth.js";
+import { addClient } from "../utils/events.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/event-stream')
-  res.setHeader('Cache-Control', 'no-cache')
-  res.setHeader('Connection', 'keep-alive')
+router.get("/", authenticateToken, (req, res) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
 
-  res.flushHeaders?.()
+  res.flushHeaders?.();
 
-  const removeClient = addClient(res)
+  const removeClient = addClient(req.user.userId, res);
 
-  req.on('close', () => {
-    removeClient()
-  })
-})
+  req.on("close", () => {
+    removeClient();
+  });
+});
 
-export default router
+export default router;

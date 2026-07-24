@@ -4,21 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' data:;
+        connect-src 'self' ws: wss:;
+      "
+    />
+
     <title>Mood Tracker</title>
-    <script type="module" crossorigin src="/assets/index-DC0U1cm3.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-BI-kLG0m.css">
+    <script type="module" crossorigin src="/assets/index-BH44g4dN.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DjXC1Bhd.css">
   </head>
+
   <body>
     <div id="root"></div>
   </body>
 </html>
-<meta
-  http-equiv="Content-Security-Policy"
-  content="
-    default-src 'self';
-    script-src 'self';
-    style-src 'self' 'unsafe-inline';
-    img-src 'self' data:;
-    connect-src 'self' ws: wss:;
-  "
-/>

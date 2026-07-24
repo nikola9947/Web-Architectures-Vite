@@ -111,6 +111,7 @@ router.post('/', async (req, res) => {
     )
 
     sendEventToClients('entries-updated', {
+      userId,
       type: 'created',
       entryId: newEntry.id
     })
@@ -175,6 +176,7 @@ router.put('/:id', async (req, res) => {
     )
 
     sendEventToClients('entries-updated', {
+      userId,
       type: 'updated',
       entryId: updated.id
     })
@@ -207,6 +209,7 @@ router.delete('/:id', async (req, res) => {
     )
 
     sendEventToClients('entries-updated', {
+      userId,
       type: 'deleted',
       entryId
     })

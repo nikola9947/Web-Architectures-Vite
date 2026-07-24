@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../lib/prisma.js";
 import { generateCsrfToken } from "../middleware/csrf.js";
+import rateLimit from "express-rate-limit";
 
 const router = express.Router();
 
@@ -77,7 +78,17 @@ const csrfCookieOptions = {
   path: "/"
 };
 
-router.post("/register", async (req, res) => {
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 Minuten
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: "Zu viele Anmeldeversuche. Bitte versuche es in 15 Minuten erneut."
+  }
+});
+
+router.post("/register", authLimiter, async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -131,7 +142,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 

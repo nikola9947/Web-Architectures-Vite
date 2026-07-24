@@ -4,7 +4,8 @@ import { fileURLToPath } from 'url'
 import fs from 'fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, '../../data/moodtracker.db')
+const DB_PATH =
+  process.env.DB_PATH || path.join(__dirname, '../../data/moodtracker.db')
 
 // Ensure data directory exists
 const DATA_DIR = path.dirname(DB_PATH)
@@ -46,6 +47,22 @@ export const dbAll = (sql, params = []) => {
       else resolve(rows)
     })
   })
+}
+
+// Validate Spotify URLs
+const isValidSpotifyUrl = (url) => {
+  if (!url) return true
+
+  try {
+    const parsed = new URL(url)
+
+    return (
+      parsed.protocol === 'https:' &&
+      parsed.hostname === 'open.spotify.com'
+    )
+  } catch {
+    return false
+  }
 }
 
 export const initializeDatabase = async () => {
@@ -131,7 +148,6 @@ export const initializeDatabase = async () => {
     throw error
   }
 }
-
 const seedDefaultSkills = async () => {
   try {
     const existingSkills = await dbAll('SELECT COUNT(*) as count FROM skills')
@@ -241,7 +257,8 @@ const seedDefaultSkills = async () => {
           for_moods: 'anxious,stressed,overwhelmed',
           instructions:
             'Put on headphones and focus on the sound for 5 minutes.',
-          spotify_url: 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO',
+          spotify_url:
+            'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO',
           example_title: 'Calm Piano Playlist',
           duration: '5-15 min',
           level: 'easy'
@@ -249,6 +266,12 @@ const seedDefaultSkills = async () => {
       ]
 
       for (const skill of skills) {
+        if (!isValidSpotifyUrl(skill.spotify_url)) {
+          throw new Error(
+            `Invalid Spotify URL for skill "${skill.name}": ${skill.spotify_url}`
+          )
+        }
+
         await dbRun(
           `
           INSERT INTO skills (
